@@ -39,6 +39,8 @@ export interface RoomDocument {
   magicLinkToken?: string
   /** Magic link token expiration timestamp (optional) */
   magicLinkExpiresAt?: Timestamp
+  /** Jitsi Meet room URL (optional, deprecated - room name is derived from room ID) */
+  dailyRoomUrl?: string
 }
 
 /**
@@ -71,5 +73,6 @@ export interface UpdateRoomInput {
   taskId?: string | null
   magicLinkToken?: string
   magicLinkExpiresAt?: Timestamp
+  dailyRoomUrl?: string
 }
 

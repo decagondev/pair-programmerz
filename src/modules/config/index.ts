@@ -4,7 +4,7 @@
  * This module provides centralized configuration for all external services:
  * - Firebase (Auth, Firestore)
  * - Liveblocks (real-time collaboration)
- * - Daily.co (video/voice)
+ * - Jitsi Meet (video/voice)
  * 
  * All configuration is validated at app startup via environment variables.
  * 
@@ -20,6 +20,6 @@ export { firebaseApp, auth, db } from './firebase'
 // Liveblocks
 export { liveblocksClient } from './liveblocks'
 
-// Daily.co
-export { dailyDomain, dailyApiKey, DailyIframe } from './daily'
+// Jitsi Meet
+export { jitsiDomain, defaultJitsiConfig, defaultJitsiInterfaceConfig } from './jitsi'
 

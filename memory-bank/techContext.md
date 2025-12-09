@@ -39,6 +39,8 @@
 - **react-hook-form** - Form management
 - **@hookform/resolvers** - Form validation resolvers (zod)
 - **date-fns** - Date formatting utilities
+- **@jitsi/react-sdk** - Jitsi Meet React SDK for video/voice
+- **@daily-co/daily-js** - Daily.co video/voice SDK
 
 ## Development Setup
 
@@ -104,7 +106,7 @@ VITE_DAILY_DOMAIN=
 
 ### Performance
 - **Code splitting** - Lazy load routes and heavy components
-- **Lazy load Daily.co** - Only load when needed
+- **Lazy load Jitsi Meet** - Only load when needed (JitsiMeeting component)
 - **React.memo** - Where needed for optimization
 - **Bundle analysis** - Track bundle size
 

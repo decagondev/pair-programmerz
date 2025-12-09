@@ -18,9 +18,8 @@ const envSchema = z.object({
   // Liveblocks configuration
   VITE_LIVEBLOCKS_PUBLIC_KEY: z.string().min(1, 'Liveblocks public key is required'),
 
-  // Daily.co configuration
-  VITE_DAILY_API_KEY: z.string().min(1, 'Daily.co API key is required'),
-  VITE_DAILY_DOMAIN: z.string().min(1, 'Daily.co domain is required'),
+  // Jitsi configuration (optional - defaults to meet.jit.si)
+  VITE_JITSI_DOMAIN: z.string().optional(),
 })
 
 /**
@@ -39,8 +38,7 @@ export const env = envSchema.parse({
   VITE_FIREBASE_MESSAGING_SENDER_ID: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
   VITE_FIREBASE_APP_ID: import.meta.env.VITE_FIREBASE_APP_ID,
   VITE_LIVEBLOCKS_PUBLIC_KEY: import.meta.env.VITE_LIVEBLOCKS_PUBLIC_KEY,
-  VITE_DAILY_API_KEY: import.meta.env.VITE_DAILY_API_KEY,
-  VITE_DAILY_DOMAIN: import.meta.env.VITE_DAILY_DOMAIN,
+  VITE_JITSI_DOMAIN: import.meta.env.VITE_JITSI_DOMAIN,
 })
 
 /**

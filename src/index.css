@@ -1,4 +1,20 @@
 @import "tailwindcss";
+
+/* Reaction animation */
+@keyframes reactionFloat {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-200px) scale(1.5);
+  }
+}
+
+.animate-reaction-float {
+  animation: reactionFloat 3s ease-out forwards;
+}
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));

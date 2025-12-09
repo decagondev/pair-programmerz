@@ -1,16 +1,30 @@
 # Active Context
 
 ## Current Work Focus
-**Epic 3: Collaborative Editor - COMPLETED**
+**Epic 4: Video, Voice & Presence UI - COMPLETED**
+**Migration: Daily.co → Jitsi Meet - COMPLETED**
 
-Successfully implemented complete collaborative code editor with:
-- Liveblocks room provider with presence awareness
-- CodeMirror 6 editor with Yjs binding for real-time sync
-- Driver/navigator role switching with storage-based control
-- File tree component with starter code loading from tasks
-- Complete editor layout with all components integrated
+Successfully implemented complete video/voice integration with:
+- Jitsi Meet React SDK integration with auto-join and video controls
+- Floating draggable video tiles (Figma-style)
+- Screen share functionality via Jitsi External API
+- Reactions system with emoji animations (Liveblocks-based)
+- Raise hand notification system (Liveblocks-based)
 
 ## Recent Changes
+
+### Daily.co → Jitsi Meet Migration (COMPLETED)
+- ✅ Removed `@daily-co/daily-js` package
+- ✅ Installed `@jitsi/react-sdk` package
+- ✅ Created `useJitsiCall` hook to replace `useDailyCall`
+- ✅ Created `JitsiVideo` component using `JitsiMeeting` from React SDK
+- ✅ Updated `VideoControls` to use Jitsi External API
+- ✅ Updated `useScreenShare` to use Jitsi External API commands
+- ✅ Updated `VideoGrid` to use Jitsi participant tracking
+- ✅ Updated configuration: `VITE_JITSI_DOMAIN` (optional, defaults to `meet.jit.si`)
+- ✅ Removed old Daily.co files and references
+- ✅ All TypeScript build errors resolved
+- ✅ Build passes successfully
 
 ### Epic 2 Progress (COMPLETED)
 - ✅ TanStack Query installed and configured with QueryClientProvider
@@ -29,10 +43,10 @@ Successfully implemented complete collaborative code editor with:
 
 ## Next Steps
 
-### Immediate (Epic 4)
-1. Daily.co video/voice integration
-2. Floating video tiles with drag functionality
-3. Reactions and raise hand features
+### Immediate (Epic 5)
+1. Timer & Phase Engine implementation
+2. Phase transitions (Set Tone → Code → Reflection)
+3. Big visible timer with sound alerts
 
 ## Active Decisions
 
@@ -40,7 +54,7 @@ Successfully implemented complete collaborative code editor with:
 - **Feature-sliced design** - Chosen for modularity and testability
 - **Zustand + TanStack Query** - Client state vs server state separation (TanStack Query now integrated)
 - **Liveblocks + Yjs** - Real-time collaboration stack
-- **Daily.co** - Video/voice provider (100ms as backup)
+- **Jitsi Meet** - Video/voice provider via React SDK (100ms as backup, not used)
 - **Real-time subscriptions** - Firestore onSnapshot with TanStack Query cache updates
 
 ### Development Decisions
@@ -60,7 +74,6 @@ Successfully implemented complete collaborative code editor with:
 
 ### Questions to Resolve
 - Cloud Function implementation for magic link token generation (deferred to deployment phase)
-- Daily.co account setup (when Epic 4 starts)
 - Yjs document persistence strategy (currently creates new document per session)
 
 ## Context Notes

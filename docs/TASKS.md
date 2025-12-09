@@ -5,7 +5,7 @@ Ready to paste directly into GitHub Projects / Linear / Notion / Cursor Tasks
 Everything follows **SOLID**, **feature-sliced design**, **100% TypeScript strict**, and is built with **Cursor IDE as the single source of truth**.
 
 Current date: Dec 09, 2025  
-Stack: Vite + React 18 + TS + Tailwind 4 + shadcn/ui + Firebase + Liveblocks + Daily.co
+Stack: Vite + React 18 + TS + Tailwind 4 + shadcn/ui + Firebase + Liveblocks + Jitsi Meet
 
 ### EPIC 0 – Cursor Memory Bank & Project Foundations (The Eternal Brain)
 
@@ -14,7 +14,7 @@ Stack: Vite + React 18 + TS + Tailwind 4 + shadcn/ui + Firebase + Liveblocks + D
 | 0.1  | Initialize Memory Bank & Decision Log                       | 1. Create `MEMORY_BANK.md` (this entire tasklist + future decisions)<br>2. Create `ARCHITECTURE.md`<br>3. Create `DECISIONS/` folder for ADRs | Yes |
 | 0.2  | Create 15+ Cursor Rules (the DNA of the project)           | See full list below – each commit adds 1–3 rules to `.cursor/rules/`                                                                                                               | Yes |
 | 0.3  | Enforce Folder-by-Feature + SOLID Structure                   | 1. Create `/src/modules` as only feature folder<br>2. Add `src/lib`, `src/hooks`, `src/types`<br>3. Add barrel files everywhere<br>4. ESLint + simple-import-sort + @typescript-eslint | Yes |
-| 0.4  | Global Config & Environment Module                         | 1. `src/modules/config/env.ts` (zod validation)<br>2. `src/modules/config/firebase.ts`<br>3. `src/modules/config/liveblocks.ts`<br>4. `src/modules/config/daily.ts` | Yes |
+| 0.4  | Global Config & Environment Module                         | 1. `src/modules/config/env.ts` (zod validation)<br>2. `src/modules/config/firebase.ts`<br>3. `src/modules/config/liveblocks.ts`<br>4. `src/modules/config/jitsi.ts` | Yes |
 | 0.5  | Global Store Foundation (Zustand + Persistence)            | 1. Create `src/modules/store/index.ts`<br>2. Add `useUserStore`, `useRoomStore` skeletons<br>3. Add Zustand middleware (devtools + persist) | Yes |
 
 #### Cursor Rules Added in Epic 0 (copy-paste these into `.cursor/rules/`)
@@ -81,8 +81,8 @@ Stack: Vite + React 18 + TS + Tailwind 4 + shadcn/ui + Firebase + Liveblocks + D
 
 | PR # | Title                                           | Commits & Sub-tasks                                                                                                              |
 |------|-------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------|
-| 4.1  | Daily.co Prebuilt Embed                         | • `<DailyVideo />` component<br>• Auto-join with displayName = role<br>• Mic/camera UI                                                |
-| 4.2  | Floating/Movable Video Tiles + Screen Share     | • Draggable video tiles<br>• Screen share button (Daily native)                                                                    |
+| 4.1  | Jitsi Meet React SDK Integration               | • `<JitsiVideo />` component using `JitsiMeeting`<br>• Auto-join with displayName = role<br>• Mic/camera UI via External API |
+| 4.2  | Floating/Movable Video Tiles + Screen Share     | • Jitsi video rendering<br>• Screen share button (Jitsi native via External API)                                                    |
 | 4.3  | Emoji Reactions & Raise Hand                     | • Click → emoji flies<br>• Raise hand → bell notification                                                                 |
 
 ### EPIC 5 – Timer & Phase Engine
@@ -115,6 +115,6 @@ Stack: Vite + React 18 + TS + Tailwind 4 + shadcn/ui + Firebase + Liveblocks + D
 | 8.1  | Mobile & Tablet Responsiveness                  | • Stack layout on <768px<br>• Touch-friendly controls                                                                              |
 | 8.2  | Accessibility + Keyboard Shortcuts              | • All buttons focusable<br>• Cmd+Enter to send message<br>• Screen reader labels                                               |
 | 8.3  | Firebase Hosting + CI/CD                        | • GitHub Actions workflow<br>• Auto-deploy on merge to main                                                                        |
-| 8.4  | Lighthouse 95+ & Bundle Optimization            | • Code splitting<br>• Lazy Daily.co<br>• Image optimization (none needed)                                                         |
+| 8.4  | Lighthouse 95+ & Bundle Optimization            | • Code splitting<br>• Lazy Jitsi Meet<br>• Image optimization (none needed)                                                         |
 
 Total: **8 Epics | 33 PRs | ~150 commits**

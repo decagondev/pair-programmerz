@@ -6,7 +6,7 @@
 - Tailwind CSS v4 + shadcn/ui (already initialized by you)  
 - Firebase v9+ (Auth, Firestore, Functions, Hosting)  
 - Liveblocks (primary real-time) — fallback Yjs if needed  
-- Daily.co (video/voice) — 100ms as backup  
+- Jitsi Meet (video/voice) — 100ms as backup  
 - Zustand + TanStack Query  
 - Lucide icons, clsx, tailwind-merge  
 - Cursor IDE + Memory Bank (Epic 0)
@@ -23,7 +23,7 @@ Goal: Everything lives in Cursor’s memory forever. No knowledge loss.
 |------|-----------------------------------------|--------------------------------------------------------------------------------------------------------|
 | 0.1  | Initialize Memory Bank & Project Rules  | • Create `.cursor/rules/` with coding standards<br>• Add `MEMORY_BANK.md` (this PRD + decisions)<br>• Add `ARCHITECTURE.md`<br>• Configure Cursor MCP for Firebase & Liveblocks |
 | 0.2  | Enforce SOLID + Folder Structure         | • `/src/modules/` becomes the single source of truth<br>• Create `src/lib/`, `src/hooks/`, `src/types/`<br>• Add barrel files (`index.ts`)<br>• ESLint + Prettier + simple-import-sort rules |
-| 0.3  | Global State & Config Module             | • Create `src/modules/config/` (env, firebase, liveblocks, daily)<br>• Create `src/modules/store/` (Zustand base store)<br>• Create `src/modules/ui/` (Toast, ThemeProvider, etc.) |
+| 0.3  | Global State & Config Module             | • Create `src/modules/config/` (env, firebase, liveblocks, jitsi)<br>• Create `src/modules/store/` (Zustand base store)<br>• Create `src/modules/ui/` (Toast, ThemeProvider, etc.) |
 
 Status: Ready for you to merge after your Vite + Tailwind + shadcn starter
 
@@ -64,8 +64,8 @@ Status: Ready for you to merge after your Vite + Tailwind + shadcn starter
 
 | PR # | Title                            | Commits / Sub-tasks                                                                            |
 |------|----------------------------------|------------------------------------------------------------------------------------------------|
-| 4.1  | Daily.co Integration             | • Prebuilt embed `<DailyIframe />`<br>• Auto-join on room enter<br>• Mic/camera controls        |
-| 4.2  | Floating Video Grid + Screen Share | • Movable video tiles (like Figma)<br>• Screen share button (Daily supports it natively)       |
+| 4.1  | Jitsi Meet Integration          | • React SDK `<JitsiMeeting />` component<br>• Auto-join on room enter<br>• Mic/camera controls via External API |
+| 4.2  | Floating Video Grid + Screen Share | • Jitsi video rendering<br>• Screen share button (Jitsi supports it natively via External API) |
 | 4.3  | Reactions & Raise Hand           | • Emoji rain on click<br>• Raise hand → notification bell                                          |
 
 ---
@@ -106,7 +106,7 @@ Status: Ready for you to merge after your Vite + Tailwind + shadcn starter
 | 8.1  | Mobile-Responsive Layout                | • Editor shrinks, video goes bottom on small screens                                   |
 | 8.2  | Keyboard Shortcuts + Accessibility      | • Cmd/Ctrl + Enter to send message<br>• Focus management, ARIA labels                  |
 | 8.3  | Firebase Hosting + CI/CD                | • GitHub Actions → `firebase deploy` on merge to main                                  |
-| 8.4  | Performance & Bundle Analysis           | • Lazy load Daily.co, code splitting, React.memo everywhere needed                     |
+| 8.4  | Performance & Bundle Analysis           | • Lazy load Jitsi Meet, code splitting, React.memo everywhere needed                     |
 
 ---
 
@@ -126,7 +126,7 @@ Status: Ready for you to merge after your Vite + Tailwind + shadcn starter
     /config
     /store
     /ui
-  /lib          → firebase, liveblocks, daily, utils
+  /lib          → firebase, liveblocks, jitsi, utils
   /hooks        → useRoom, usePresence, useDriver, etc.
   /types        → global TS types
   /data         → sampleTasks fallback

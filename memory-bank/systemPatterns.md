@@ -95,9 +95,25 @@ Each module owns:
   - Participant access: Users in `createdBy` or `participants` array can read
 
 ### Video/Voice
-- **Daily.co** - Primary video/voice provider
-- **100ms** - Backup option if needed
-- **Prebuilt embed** - Fast integration, native features
+- **Jitsi Meet** - Primary video/voice provider (integrated)
+  - React SDK with `JitsiMeeting` component
+  - External API for programmatic control
+  - Auto-join on room entry
+  - Native screen share support via External API
+  - Participant tracking via `getParticipantsInfo()`
+  - Domain: `meet.jit.si` (default) or custom domain via `VITE_JITSI_DOMAIN`
+- **100ms** - Backup option if needed (not currently used)
+- **Video Module Structure**:
+  - `useJitsiCall` - Call lifecycle management with External API
+  - `JitsiVideo` - Main video component using JitsiMeeting
+  - `useDraggable` - Drag functionality for video tiles
+  - `useScreenShare` - Screen share management via Jitsi External API
+  - `useReactions` - Reactions state (Liveblocks storage, independent of video provider)
+  - `useRaiseHand` - Raise hand state (Liveblocks storage, independent of video provider)
+- **Floating Video Tiles** - Figma-style draggable tiles
+- **Reactions** - Emoji animations with Liveblocks sync
+- **Raise Hand** - Notification system with sound alerts
+- **Migration**: Migrated from Daily.co to Jitsi Meet React SDK (Dec 2025)
 
 ## Component Patterns
 

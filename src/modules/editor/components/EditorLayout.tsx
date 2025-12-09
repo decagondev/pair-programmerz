@@ -1,6 +1,7 @@
 import { LiveblocksRoomProvider, CodeEditor, DriverIndicator, DriverControls, PresenceIndicator, FileTree } from '../index'
 import { useDriver } from '../hooks/useDriver'
 import { useFileTree } from '../hooks/useFileTree'
+import { VideoGrid, VideoControls, ReactionBar, ReactionAnimation, RaiseHandButton, RaiseHandNotification } from '@/modules/video'
 import { useAuth } from '@/modules/auth'
 import { useUserStore } from '@/modules/store'
 import { cn } from '@/lib/utils'
@@ -42,10 +43,15 @@ function EditorLayoutContent({ roomId, className }: EditorLayoutProps) {
 
   return (
     <div className={cn('flex h-screen flex-col', className)}>
+      <ReactionAnimation roomId={roomId} />
+      <RaiseHandNotification roomId={roomId} />
       <header className="flex items-center justify-between border-b bg-background p-4">
         <h1 className="text-xl font-semibold">Interview Room</h1>
         <div className="flex items-center gap-4">
-          <PresenceIndicator />
+          <PresenceIndicator roomId={roomId} />
+          <ReactionBar roomId={roomId} />
+          <RaiseHandButton roomId={roomId} />
+          <VideoControls roomId={roomId} />
           <DriverControls roomId={roomId} />
         </div>
       </header>
@@ -66,6 +72,12 @@ function EditorLayoutContent({ roomId, className }: EditorLayoutProps) {
             className="h-full"
           />
         </main>
+        <aside className="w-80 border-l bg-muted/50">
+          <div className="h-full p-2">
+            <h2 className="mb-2 text-sm font-semibold">Video</h2>
+            <VideoGrid roomId={roomId} className="h-full" />
+          </div>
+        </aside>
       </div>
     </div>
   )

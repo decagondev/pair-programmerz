@@ -10,7 +10,12 @@ import { cn } from '@/lib/utils'
  * 
  * @param driverId - Current driver's user ID (optional)
  */
-export function PresenceIndicator({ driverId }: { driverId?: string | null }) {
+interface PresenceIndicatorProps {
+  driverId?: string | null
+  roomId?: string | null
+}
+
+export function PresenceIndicator({ driverId }: PresenceIndicatorProps) {
   const { self, others } = usePresence()
 
   const allUsers = [
@@ -53,6 +58,8 @@ export function PresenceIndicator({ driverId }: { driverId?: string | null }) {
               {isDriver && (
                 <div className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-green-500 ring-2 ring-background" />
               )}
+              {/* Note: Presence doesn't store userId, so we can't match raised hands to presence users
+                  This would require storing userId in presence data */}
             </div>
           )
         })}

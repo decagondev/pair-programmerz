@@ -54,10 +54,14 @@
 - ✅ Starter code loading from tasks
 - ✅ Complete editor layout integration
 
-### Epic 4: Video & Presence UI
-- Daily.co integration
-- Floating video tiles
-- Reactions & raise hand
+### Epic 4: Video & Presence UI (Completed)
+- ✅ Jitsi Meet React SDK integration with auto-join
+- ✅ Video controls (mic/camera toggles) via Jitsi External API
+- ✅ Floating draggable video tiles
+- ✅ Screen share functionality via Jitsi External API
+- ✅ Reactions system with emoji animations (Liveblocks-based)
+- ✅ Raise hand notification system (Liveblocks-based)
+- ✅ Migrated from Daily.co to Jitsi Meet (Dec 2025)
 
 ### Epic 5: Timer & Phase Engine
 - Phase system
@@ -81,7 +85,7 @@
 
 ## Current Status
 
-**Overall Progress:** ~37% (Epic 0, Epic 1, Epic 2, and Epic 3 completed)
+**Overall Progress:** ~50% (Epic 0, Epic 1, Epic 2, Epic 3, and Epic 4 completed)
 
 **Completed:**
 - Project setup (Vite, React, TypeScript)
@@ -92,7 +96,7 @@
 - Epic 3: Collaborative Editor (complete editor with real-time collaboration)
 
 **In Progress:**
-- Epic 4: Video & Presence UI (next)
+- Epic 5: Timer & Phase Engine (next)
 
 **Blocked:**
 - None
@@ -113,5 +117,5 @@
 - None yet
 
 ## Next Milestone
-Epic 4: Video & Presence UI - Daily.co integration, floating video tiles, reactions and raise hand
+Epic 5: Timer & Phase Engine - Phase system, timer with alerts, phase-specific UI
 
