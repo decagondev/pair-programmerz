@@ -1,0 +1,34 @@
+Description: Naming conventions and folder structure standards
+Globs: **/*.{ts,tsx}
+
+# Naming and Structure Rules
+
+## Folder Structure
+- Always use feature-sliced design: `/src/modules/<feature>/`
+- Every module must export only via `index.ts` (barrel export)
+- Never create files outside the established structure
+
+## File Naming
+- Component files: `PascalCase.tsx` (e.g., `RoomCard.tsx`)
+- Hook files: `useSomething.ts` (e.g., `useAuth.ts`)
+- Utility files: `camelCase.ts` (e.g., `formatDate.ts`)
+- Type files: `types.ts` or `index.ts` within module
+- Test files: `*.test.ts` or `*.spec.ts`
+
+## Import Paths
+- Always use absolute imports with `@/` prefix
+- Never use relative imports going up directories (`../`, `../../`)
+- Example: `import { useAuth } from '@/modules/auth'` not `import { useAuth } from '../../modules/auth'`
+
+## Module Structure
+Each module should have:
+- `index.ts` - Barrel export (public API only)
+- `types.ts` - TypeScript types/interfaces
+- `hooks/` - Custom hooks (if multiple)
+- `components/` - React components (if multiple)
+- Internal implementation files (not exported)
+
+## Barrel Exports
+- Only export public APIs in `index.ts`
+- Keep implementation details private
+- Example: Export `useAuth` hook, but not internal `validateToken` function

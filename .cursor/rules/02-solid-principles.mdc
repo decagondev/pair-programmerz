@@ -1,0 +1,50 @@
+Description: SOLID principles and clean code practices
+Globs: **/*.{ts,tsx}
+
+# SOLID Principles
+
+## Single Responsibility Principle (SRP)
+- One component = one job
+- One hook = one concern
+- One function = one action
+- If a component/hook/function does multiple things, split it
+
+## Dependency Injection
+- Never put Firebase calls directly inside components
+- Use custom hooks in `/hooks` or module-specific hooks
+- All async state → TanStack Query or Zustand actions
+- Components receive data via props or hooks, not direct service calls
+
+## Type Safety
+- No `any` types - use `unknown` or proper types
+- Always define interfaces for component props
+- Use TypeScript strict mode features
+- Prefer type inference where possible, explicit types where needed
+
+## Clean Code Practices
+- Functions should be small and focused
+- Use descriptive names (longer is better than unclear)
+- Extract magic numbers/strings to constants
+- Prefer composition over inheritance
+- Keep functions pure when possible (no side effects)
+
+## Example: Bad vs Good
+
+Bad:
+```typescript
+function Component() {
+  const [data, setData] = useState<any>(null)
+  useEffect(() => {
+    getFirestore().collection('rooms').get().then(setData)
+  }, [])
+  // ...
+}
+```
+
+Good:
+```typescript
+function Component() {
+  const { data } = useRooms() // Custom hook handles Firebase
+  // ...
+}
+```

@@ -1,0 +1,65 @@
+Description: Error boundaries and error state patterns
+Globs: **/*.{ts,tsx}
+
+# Error Handling
+
+## Error Boundaries
+- Use React Error Boundaries for component tree errors
+- Create error boundary component in `src/modules/ui/`
+- Wrap route-level components with error boundaries
+- Show user-friendly error messages, not stack traces
+
+## Error State Management
+- Handle errors in hooks and utilities
+- Return error state from hooks: `{ data, error, isLoading }`
+- Use TanStack Query error handling for server errors
+- Handle Firebase/Liveblocks errors gracefully
+
+## Error Patterns
+
+### Hook Error Handling
+```typescript
+export function useRooms() {
+  const { data, error, isLoading } = useQuery({
+    queryKey: ['rooms'],
+    queryFn: fetchRooms,
+    onError: (error) => {
+      // Log error, show toast, etc.
+    },
+  })
+  return { rooms: data, error, isLoading }
+}
+```
+
+### Component Error Handling
+```typescript
+function Component() {
+  const { data, error } = useRooms()
+  
+  if (error) {
+    return <ErrorDisplay error={error} />
+  }
+  // ...
+}
+```
+
+## Error Types
+- Create typed error classes when needed
+- Use error codes for different error types
+- Provide actionable error messages to users
+
+## User Experience
+- Show user-friendly error messages
+- Provide retry mechanisms where appropriate
+- Log errors for debugging (development only)
+- Don't expose internal error details to users
+
+## Firebase Errors
+- Handle Firebase Auth errors (network, invalid credentials, etc.)
+- Handle Firestore errors (permission denied, not found, etc.)
+- Show appropriate messages for each error type
+
+## Liveblocks Errors
+- Handle connection errors gracefully
+- Show reconnection status to users
+- Handle storage sync errors

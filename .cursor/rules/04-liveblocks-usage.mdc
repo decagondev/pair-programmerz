@@ -1,0 +1,39 @@
+Description: Liveblocks real-time collaboration patterns
+Globs: **/*.{ts,tsx}
+
+# Liveblocks Usage
+
+## Presence and Storage
+- All Liveblocks presence/storage goes through `useRoomContext()` or module-specific hooks
+- Never access `window.liveblocks` directly
+- Use Liveblocks React hooks: `useOthers`, `useStorage`, `useMutation`
+
+## Driver ID Management
+- Driver ID always stored in `storage.driverId` (Liveblocks storage)
+- Use `useStorage` to read driver ID
+- Use `useMutation` to update driver ID
+- Never store driver state in local component state
+
+## Room Provider
+- Wrap app or room component with `<LiveblocksProvider>`
+- Provider should be at appropriate level (not too high, not too low)
+- Use room ID from Firestore room document
+
+## Presence Awareness
+- Use `useOthers()` for other participants' presence
+- Use `useSelf()` for current user's presence
+- Update presence when user actions occur (typing, cursor movement)
+
+## Storage Pattern
+```typescript
+// Good: Use Liveblocks hooks
+const driverId = useStorage((root) => root.driverId)
+const updateDriver = useMutation(({ storage }, newDriverId) => {
+  storage.set('driverId', newDriverId)
+})
+```
+
+## Yjs Integration
+- Yjs document synced through Liveblocks storage
+- CodeMirror binds to Yjs document
+- Never manipulate Yjs directly - use CodeMirror API

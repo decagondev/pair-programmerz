@@ -1,0 +1,65 @@
+Description: Performance optimization patterns
+Globs: **/*.{ts,tsx}
+
+# Performance Optimization
+
+## Code Splitting
+- Lazy load routes with `React.lazy()`
+- Lazy load heavy components (Daily.co, CodeMirror)
+- Use dynamic imports for large dependencies
+- Split code at route boundaries
+
+## React Optimization
+- Use `React.memo` for expensive components
+- Use `useMemo` for expensive computations
+- Use `useCallback` for stable function references
+- Avoid unnecessary re-renders
+
+## Bundle Optimization
+- Analyze bundle size regularly
+- Remove unused dependencies
+- Use tree-shaking friendly imports
+- Consider code splitting for large features
+
+## Lazy Loading Pattern
+```typescript
+// Lazy load Daily.co
+const DailyVideo = lazy(() => import('@/modules/video/DailyVideo'))
+
+// Lazy load routes
+const Dashboard = lazy(() => import('@/modules/dashboard/Dashboard'))
+```
+
+## Memoization
+```typescript
+// Memoize expensive computations
+const expensiveValue = useMemo(() => {
+  return computeExpensiveValue(data)
+}, [data])
+
+// Memoize callbacks
+const handleClick = useCallback(() => {
+  // handler logic
+}, [dependencies])
+```
+
+## Image Optimization
+- Use appropriate image formats (WebP when possible)
+- Lazy load images below the fold
+- Use responsive images for different screen sizes
+
+## Network Optimization
+- Minimize Firebase reads (batch queries when possible)
+- Cache Firestore queries with TanStack Query
+- Optimize Liveblocks presence updates (debounce if needed)
+
+## Performance Monitoring
+- Use React DevTools Profiler
+- Monitor bundle size
+- Track Core Web Vitals
+- Profile in production-like environment
+
+## When to Optimize
+- Don't optimize prematurely
+- Profile first, optimize bottlenecks
+- Measure before and after optimizations

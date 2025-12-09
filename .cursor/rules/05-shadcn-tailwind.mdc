@@ -1,0 +1,39 @@
+Description: shadcn/ui and Tailwind CSS usage
+Globs: **/*.{ts,tsx}
+
+# shadcn/ui and Tailwind CSS
+
+## Class Name Utilities
+- Always use `cn()` from `@/lib/utils` (tailwind-merge + clsx)
+- Never use inline styles or `!important`
+- Prefer Tailwind utility classes over custom CSS
+
+## Component Usage
+- Prefer shadcn components over raw HTML
+- Use shadcn components from `@/components/ui/`
+- Extend shadcn components when needed, don't modify source
+
+## Styling Patterns
+```typescript
+// Good: Use cn() for conditional classes
+<Button className={cn("base-classes", isActive && "active-classes")} />
+
+// Bad: Inline styles or !important
+<Button style={{ color: 'red' }} />
+<Button className="!text-red" />
+```
+
+## Dark Mode
+- Use Tailwind dark mode classes: `dark:bg-background`
+- Test both light and dark themes
+- Use CSS variables from shadcn theme
+
+## Responsive Design
+- Use Tailwind breakpoints: `sm:`, `md:`, `lg:`, `xl:`
+- Mobile-first approach
+- Test on multiple screen sizes
+
+## Component Composition
+- Compose shadcn components to build complex UIs
+- Don't duplicate shadcn component code
+- Create wrapper components in modules when needed

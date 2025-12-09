@@ -1,0 +1,49 @@
+Description: TypeScript strict mode compliance and type safety
+Globs: **/*.{ts,tsx}
+
+# TypeScript Standards
+
+## Strict Mode Compliance
+- All code must comply with TypeScript strict mode
+- No `any` types - use `unknown` or proper types
+- Enable all strict checks: `noUnusedLocals`, `noUnusedParameters`, etc.
+- Use type inference where possible, explicit types where needed
+
+## Type Definitions
+- Define interfaces in module `types.ts` or `src/types/`
+- Use `type` for unions/intersections, `interface` for objects
+- Export types from module `index.ts` for public API
+- Keep internal types private
+
+## Type Safety Patterns
+```typescript
+// Good: Proper typing
+interface User {
+  id: string
+  email: string
+  role: 'interviewer' | 'candidate'
+}
+
+// Bad: Using any
+function processUser(user: any) { }
+```
+
+## Generic Types
+- Use generics for reusable utilities
+- Provide type constraints where appropriate
+- Document generic type parameters
+
+## Type Guards
+- Use type guards for runtime type checking
+- Prefer `typeof`, `instanceof`, or custom type predicates
+- Example: `function isUser(obj: unknown): obj is User`
+
+## Utility Types
+- Use TypeScript utility types: `Partial`, `Pick`, `Omit`, `Record`
+- Create custom utility types when needed
+- Document complex type transformations
+
+## Error Handling
+- Type error objects properly
+- Use `unknown` for catch clauses: `catch (error: unknown)`
+- Create typed error classes when needed

@@ -1,0 +1,75 @@
+Description: Accessibility standards and patterns
+Globs: **/*.{ts,tsx}
+
+# Accessibility
+
+## ARIA Labels
+- All interactive elements must have ARIA labels
+- Use semantic HTML elements when possible
+- Provide labels for form inputs
+- Describe button actions clearly
+
+## Keyboard Navigation
+- All interactive elements must be keyboard accessible
+- Provide visible focus indicators
+- Support Tab navigation
+- Implement keyboard shortcuts (Cmd/Ctrl + Enter, etc.)
+
+## Focus Management
+- Manage focus when modals/dialogs open/close
+- Return focus to trigger element after closing
+- Don't trap focus unnecessarily
+- Provide skip links for navigation
+
+## Screen Reader Support
+- Use semantic HTML (nav, main, article, etc.)
+- Provide alt text for images
+- Describe dynamic content changes
+- Use ARIA live regions for announcements
+
+## Patterns
+
+### Accessible Button
+```typescript
+<Button
+  aria-label="Create new room"
+  onClick={handleCreate}
+>
+  Create Room
+</Button>
+```
+
+### Accessible Form
+```typescript
+<label htmlFor="room-name">Room Name</label>
+<input
+  id="room-name"
+  aria-required="true"
+  aria-describedby="room-name-error"
+/>
+{error && <div id="room-name-error" role="alert">{error}</div>}
+```
+
+### Keyboard Shortcuts
+```typescript
+useEffect(() => {
+  const handleKeyDown = (e: KeyboardEvent) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+      handleSubmit()
+    }
+  }
+  window.addEventListener('keydown', handleKeyDown)
+  return () => window.removeEventListener('keydown', handleKeyDown)
+}, [])
+```
+
+## Color Contrast
+- Ensure sufficient color contrast (WCAG AA minimum)
+- Don't rely on color alone to convey information
+- Test with color blindness simulators
+
+## Testing
+- Test with keyboard only (no mouse)
+- Test with screen reader (VoiceOver, NVDA)
+- Use automated accessibility tools (axe, Lighthouse)
+- Manual testing is essential

@@ -1,0 +1,87 @@
+Description: Zustand vs TanStack Query usage patterns
+Globs: **/*.{ts,tsx}
+
+# State Management
+
+## State Management Tools
+
+### Zustand (Client State)
+Use Zustand for:
+- User preferences (theme, settings)
+- UI state (modals, sidebar open/closed)
+- Client-side only state
+- State that doesn't need server sync
+
+### TanStack Query (Server State)
+Use TanStack Query for:
+- Firestore queries and mutations
+- Server-side data fetching
+- Caching and synchronization
+- Optimistic updates
+
+### Liveblocks (Real-time Collaborative State)
+Use Liveblocks for:
+- Presence (cursors, avatars)
+- Collaborative storage (driver ID, shared state)
+- Real-time synchronization
+
+### Firestore (Persistent Data)
+Use Firestore for:
+- Rooms, tasks, notes (persistent data)
+- Phase management (single source of truth)
+- User data, authentication
+
+## Patterns
+
+### Zustand Store Slice
+```typescript
+export const useUserStore = create<UserSlice>()((set) => ({
+  theme: 'light',
+  setTheme: (theme) => set({ theme }),
+}))
+```
+
+### TanStack Query
+```typescript
+export function useRooms() {
+  return useQuery({
+    queryKey: ['rooms'],
+    queryFn: fetchRooms,
+  })
+}
+
+export function useCreateRoom() {
+  return useMutation({
+    mutationFn: createRoom,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['rooms'] })
+    },
+  })
+}
+```
+
+### Liveblocks Storage
+```typescript
+const driverId = useStorage((root) => root.driverId)
+const updateDriver = useMutation(({ storage }, id) => {
+  storage.set('driverId', id)
+})
+```
+
+## When to Use What
+- **Zustand**: UI state, user preferences
+- **TanStack Query**: Server data, Firestore queries
+- **Liveblocks**: Real-time collaboration
+- **Firestore**: Persistent, authoritative data
+
+## State Synchronization
+- Firestore is source of truth for persistent data
+- Liveblocks syncs real-time collaborative state
+- Zustand holds ephemeral client state
+- TanStack Query caches and syncs server state
+
+## Avoid
+- Don't duplicate state across multiple stores
+- Don't store server data in Zustand (use TanStack Query)
+- Don't store real-time collaborative state in Zustand (use Liveblocks)
+- Don't store persistent data only in client state (use Firestore)

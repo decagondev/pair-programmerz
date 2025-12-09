@@ -1,0 +1,61 @@
+Description: Custom React hooks structure and patterns
+Globs: **/hooks/**/*.ts, **/modules/**/hooks/**/*.ts
+
+# Hooks Patterns
+
+## Hook Structure
+- Custom hooks in `/src/hooks/` (shared) or module-specific `hooks/` directory
+- Hook files: `useSomething.ts`
+- Hook names: `useSomething` (camelCase, starts with `use`)
+- One hook per file (unless closely related)
+
+## Hook Responsibilities
+- Encapsulate Firebase/Liveblocks/Daily logic
+- Return clean, typed interface
+- Handle loading/error states internally
+- Provide convenient API for components
+
+## Async State Management
+- Use TanStack Query for server state (Firestore queries)
+- Use Zustand for client state (user preferences, UI state)
+- Use Liveblocks hooks for real-time collaborative state
+- Don't mix concerns - choose the right tool
+
+## Hook Patterns
+
+### Data Fetching Hook
+```typescript
+export function useRooms() {
+  return useQuery({
+    queryKey: ['rooms'],
+    queryFn: () => fetchRooms(),
+  })
+}
+```
+
+### Real-time Hook
+```typescript
+export function useRoom(roomId: string) {
+  const { data: room } = useFirestoreQuery(`rooms/${roomId}`)
+  const driverId = useStorage((root) => root.driverId)
+  return { room, driverId }
+}
+```
+
+### State Hook
+```typescript
+export function useUserStore() {
+  return useStore((state) => state.user)
+}
+```
+
+## Hook Rules
+- Follow React hooks rules (only call at top level)
+- Return consistent interface (data, loading, error)
+- Handle cleanup in useEffect (unsubscribe, etc.)
+- Memoize expensive computations with useMemo
+
+## Composition
+- Compose hooks to build complex behavior
+- Keep hooks focused and composable
+- Avoid hooks that do too much (split if needed)

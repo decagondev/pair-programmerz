@@ -1,0 +1,48 @@
+Description: Firebase and Firestore usage patterns
+Globs: **/*.{ts,tsx}
+
+# Firebase Best Practices
+
+## Firestore Calls
+- All Firestore calls go through `/src/lib/firebase/*.ts` utilities
+- Never use `onSnapshot` directly in components
+- Use custom hooks like `useFirestoreQuery` for reactive queries
+- Use TanStack Query for server state management
+
+## Security Rules
+- Security rules must be written in `/firebase/rules.snippets/` (when created)
+- Test security rules with Firebase emulator
+- Never trust client-side validation alone
+
+## Firebase Auth
+- Use Firebase Auth through `/src/modules/auth/` module
+- Anonymous auth for initial session
+- Magic links for candidate access
+- Custom tokens for role-based access
+
+## Error Handling
+- Always handle Firebase errors gracefully
+- Show user-friendly error messages
+- Log errors for debugging (in development)
+- Use error boundaries for Firebase-related components
+
+## Patterns
+
+### Query Pattern
+```typescript
+// Use custom hook, not direct Firestore call
+const { data, isLoading } = useRooms()
+```
+
+### Mutation Pattern
+```typescript
+// Use TanStack Query mutations
+const mutation = useCreateRoom()
+mutation.mutate({ taskId, createdBy })
+```
+
+### Real-time Updates
+```typescript
+// Use custom hook with onSnapshot
+const { room } = useRoom(roomId) // Handles real-time updates internally
+```

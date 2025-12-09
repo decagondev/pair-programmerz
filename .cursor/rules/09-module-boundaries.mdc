@@ -1,0 +1,62 @@
+Description: Module independence and dependency management
+Globs: **/modules/**/*.{ts,tsx}
+
+# Module Boundaries
+
+## Module Independence
+- Modules are self-contained feature domains
+- Each module owns its types, hooks, components, store slice
+- Modules should be independently testable
+- Zero circular dependencies between modules
+
+## Dependency Rules
+- Modules can import from:
+  - `@/lib/*` - Shared utilities
+  - `@/hooks/*` - Shared hooks
+  - `@/types/*` - Global types
+  - External packages
+- Modules should NOT import from other modules directly
+- Shared code between modules → move to `lib/` or `hooks/`
+
+## Module Structure
+```
+modules/auth/
+  index.ts          # Public API
+  types.ts          # Module types
+  hooks/
+    useAuth.ts
+  components/
+    AuthButton.tsx
+```
+
+## Barrel Exports
+- Each module exports via `index.ts`
+- Only export public APIs
+- Keep implementation details private
+- Example: Export `useAuth` but not `validateToken`
+
+## Cross-Module Communication
+- Use events or shared store for cross-module communication
+- Prefer props/hooks over direct module imports
+- Use Firestore/Liveblocks for cross-module state when appropriate
+
+## Example: Bad vs Good
+
+Bad:
+```typescript
+// modules/room/index.ts
+import { useAuth } from '@/modules/auth' // Circular dependency risk
+```
+
+Good:
+```typescript
+// modules/room/index.ts
+import { useAuth } from '@/hooks/useAuth' // Shared hook in /hooks
+// OR
+// Pass auth state as prop from parent component
+```
+
+## Testing
+- Modules should be testable in isolation
+- Mock dependencies from `lib/` when testing
+- Test module's public API, not internals

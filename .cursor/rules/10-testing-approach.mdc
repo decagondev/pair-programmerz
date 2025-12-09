@@ -1,0 +1,56 @@
+Description: Testing strategy and patterns (when tests are added)
+Globs: **/*.{test,spec}.{ts,tsx}
+
+# Testing Approach
+
+## Testing Strategy
+- Unit tests for hooks and utilities
+- Integration tests for module interactions
+- E2E tests for critical flows (room creation, code sync)
+- Firebase emulator for Firestore rules testing
+
+## Test Structure
+- Test files: `*.test.ts` or `*.spec.ts`
+- Co-locate tests with source or in `__tests__/` directory
+- Use descriptive test names: `describe('useAuth', () => { it('should sign in user', ...) })`
+
+## Testing Tools (Future)
+- Vitest for unit/integration tests
+- React Testing Library for component tests
+- Playwright for E2E tests
+- Firebase emulator for Firestore testing
+
+## Testing Patterns
+
+### Hook Testing
+```typescript
+describe('useAuth', () => {
+  it('should return user when authenticated', () => {
+    // Test hook behavior
+  })
+})
+```
+
+### Component Testing
+```typescript
+describe('RoomCard', () => {
+  it('should display room name', () => {
+    render(<RoomCard room={mockRoom} />)
+    // Assertions
+  })
+})
+```
+
+## Mocking
+- Mock Firebase/Liveblocks/Daily in tests
+- Use test doubles for external services
+- Mock TanStack Query when needed
+- Keep mocks simple and focused
+
+## Coverage Goals (Future)
+- Aim for 80%+ coverage on critical paths
+- Focus on business logic, not implementation details
+- Test user-facing behavior, not internal APIs
+
+## Note
+Tests will be added in later epics. This rule establishes the testing approach for when tests are implemented.

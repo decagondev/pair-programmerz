@@ -1,0 +1,58 @@
+Description: Import sorting and organization
+Globs: **/*.{ts,tsx}
+
+# Import Organization
+
+## Import Sorting
+- Use `simple-import-sort` plugin for automatic sorting
+- Group imports: external → internal → relative
+- Sort alphabetically within groups
+- Remove unused imports
+
+## Import Groups
+1. External packages (react, firebase, etc.)
+2. Internal absolute imports (`@/modules/*`, `@/hooks/*`, etc.)
+3. Relative imports (avoid - use `@/` instead)
+4. Type imports (use `import type` for types)
+
+## Import Pattern
+```typescript
+// External packages
+import { useState, useEffect } from 'react'
+import { useQuery } from '@tanstack/react-query'
+
+// Internal absolute imports
+import { useAuth } from '@/modules/auth'
+import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
+
+// Type imports
+import type { User } from '@/types'
+```
+
+## Absolute vs Relative Imports
+- Always use absolute imports with `@/` prefix
+- Never use relative imports going up (`../`, `../../`)
+- Example: `import { useAuth } from '@/modules/auth'` not `import { useAuth } from '../../modules/auth'`
+
+## Barrel Exports
+- Import from module barrel exports: `@/modules/auth` not `@/modules/auth/hooks/useAuth`
+- Barrel exports provide clean public API
+- Only import what's exported from `index.ts`
+
+## ESLint Configuration
+- ESLint configured with `simple-import-sort`
+- Auto-fix on save (if configured)
+- Enforces import organization rules
+
+## Example: Well-Organized Imports
+```typescript
+import { useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
+
+import { Button } from '@/components/ui/button'
+import { useAuth } from '@/modules/auth'
+import { cn } from '@/lib/utils'
+
+import type { User } from '@/types'
+```

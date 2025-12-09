@@ -1,0 +1,44 @@
+Description: Interview phase and timer management patterns
+Globs: **/*.{ts,tsx}
+
+# Interview Flow Patterns
+
+## Phase Management
+- Phase is sacred: only one source of truth in Firestore `rooms/{id}.phase`
+- Phase values: `'tone' | 'coding' | 'reflection' | 'ended'`
+- Never store phase in local state or Liveblocks storage
+- Use Firestore listener to react to phase changes
+
+## Timer Management
+- Timer never runs client-side only - use server timestamp fallback
+- Calculate remaining time from Firestore `startedAt` timestamp
+- Handle clock skew between client and server
+- Show warnings at 5 min, 2 min, 0 min remaining
+
+## Phase Transitions
+- Phase transitions triggered by Cloud Function or authorized user action
+- UI should react to phase changes, not trigger them directly
+- Phase-specific UI locking (hide editor in reflection, etc.)
+
+## Phase-Specific Behavior
+- **Tone phase**: Show task overview, allow video/voice setup
+- **Coding phase**: Show editor, enable driver/navigator switching
+- **Reflection phase**: Hide editor, show reflection form
+- **Ended phase**: Show summary page, disable all editing
+
+## Timer Display
+- Big visible timer in header during coding phase
+- Countdown format: `MM:SS`
+- Sound alerts at thresholds (subtle, not jarring)
+- Pause/resume if needed (future enhancement)
+
+## Example Pattern
+```typescript
+// Read phase from Firestore, not local state
+const { phase } = useRoom(roomId) // From Firestore
+const { timeRemaining } = useTimer(roomId) // Calculated from server timestamp
+
+// UI adapts to phase
+{phase === 'coding' && <Editor />}
+{phase === 'reflection' && <ReflectionForm />}
+```
