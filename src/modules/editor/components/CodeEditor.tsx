@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { useCodeEditor } from '../hooks/useCodeEditor'
+import { usePhaseLock } from '@/modules/timer'
 import { cn } from '@/lib/utils'
 
 /**
@@ -36,6 +37,10 @@ interface CodeEditorProps {
    * File content (for file switching)
    */
   fileContent?: string
+  /**
+   * Room ID (for phase lock checking)
+   */
+  roomId?: string
 }
 
 /**
@@ -54,12 +59,18 @@ export function CodeEditor({
   isDriver = false,
   activeFile,
   fileContent,
+  roomId,
 }: CodeEditorProps) {
   // Use fileContent if provided, otherwise use initialContent
   const content = fileContent ?? initialContent ?? ''
 
-  // If readOnly is not explicitly provided, determine from driver status
-  const editorReadOnly = readOnly ?? !isDriver
+  // Check phase lock if roomId is provided
+  const { isEditorLocked } = usePhaseLock(roomId ?? '')
+
+  // If readOnly is not explicitly provided, determine from driver status and phase lock
+  // Editor is read-only if: explicitly set, user is not driver, or phase locks editor
+  const editorReadOnly =
+    readOnly ?? (!isDriver || (roomId ? isEditorLocked : false))
 
   const { editorRef, isReady, setContent } = useCodeEditor(content, editorReadOnly, language)
 

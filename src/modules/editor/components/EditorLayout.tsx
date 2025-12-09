@@ -2,6 +2,7 @@ import { LiveblocksRoomProvider, CodeEditor, DriverIndicator, DriverControls, Pr
 import { useDriver } from '../hooks/useDriver'
 import { useFileTree } from '../hooks/useFileTree'
 import { VideoGrid, VideoControls, ReactionBar, ReactionAnimation, RaiseHandButton, RaiseHandNotification } from '@/modules/video'
+import { TimerDisplay, PhaseControls, usePhaseLock } from '@/modules/timer'
 import { useAuth } from '@/modules/auth'
 import { useUserStore } from '@/modules/store'
 import { cn } from '@/lib/utils'
@@ -31,6 +32,7 @@ interface EditorLayoutProps {
 function EditorLayoutContent({ roomId, className }: EditorLayoutProps) {
   const { isDriver } = useDriver(roomId)
   const { activeFile, getFileContent } = useFileTree(roomId)
+  const { isEditorLocked } = usePhaseLock(roomId)
 
   const fileContent = activeFile ? getFileContent(activeFile) : ''
 
@@ -46,7 +48,11 @@ function EditorLayoutContent({ roomId, className }: EditorLayoutProps) {
       <ReactionAnimation roomId={roomId} />
       <RaiseHandNotification roomId={roomId} />
       <header className="flex items-center justify-between border-b bg-background p-4">
-        <h1 className="text-xl font-semibold">Interview Room</h1>
+        <div className="flex items-center gap-4">
+          <h1 className="text-xl font-semibold">Interview Room</h1>
+          <TimerDisplay roomId={roomId} />
+          <PhaseControls roomId={roomId} />
+        </div>
         <div className="flex items-center gap-4">
           <PresenceIndicator roomId={roomId} />
           <ReactionBar roomId={roomId} />
@@ -64,13 +70,25 @@ function EditorLayoutContent({ roomId, className }: EditorLayoutProps) {
           </div>
         </aside>
         <main className="flex-1 overflow-hidden">
-          <CodeEditor
-            fileContent={fileContent}
-            activeFile={activeFile}
-            isDriver={isDriver}
-            language={language}
-            className="h-full"
-          />
+          {isEditorLocked ? (
+            <div className="flex h-full items-center justify-center">
+              <div className="text-center">
+                <h2 className="text-xl font-semibold">Reflection Phase</h2>
+                <p className="text-muted-foreground">
+                  The coding phase has ended. Please complete the reflection form.
+                </p>
+              </div>
+            </div>
+          ) : (
+            <CodeEditor
+              fileContent={fileContent}
+              activeFile={activeFile}
+              isDriver={isDriver}
+              language={language}
+              className="h-full"
+              roomId={roomId}
+            />
+          )}
         </main>
         <aside className="w-80 border-l bg-muted/50">
           <div className="h-full p-2">

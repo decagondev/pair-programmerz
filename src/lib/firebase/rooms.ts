@@ -119,6 +119,11 @@ export async function updateRoom(
     // Update status based on phase if phase is being updated
     if (input.phase !== undefined) {
       updateData.status = input.phase === 'ended' ? 'finished' : 'active'
+      // If phaseStartedAt is not explicitly provided, set it to server timestamp
+      // This ensures we track when the phase started for timer calculations
+      if (input.phaseStartedAt === undefined) {
+        updateData.phaseStartedAt = serverTimestamp()
+      }
     }
 
     await updateDoc(roomRef, updateData)

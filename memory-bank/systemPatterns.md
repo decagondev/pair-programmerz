@@ -149,8 +149,9 @@ export const useUserStore = create<UserSlice>()((set) => ({
 1. Interviewer creates room → Firestore `rooms/{id}` created (Epic 2 ✅)
 2. Magic link generated → Client-side token generation (placeholder, Cloud Function in deployment)
 3. Candidate joins → Validates token → Signs in → Redirects to room (Epic 1 ✅)
-4. Phase transitions → Firestore `phase` field updated (Epic 5)
-5. Session ends → Summary generated → Data persisted (Epic 6)
+4. Phase transitions → Firestore `phase` and `phaseStartedAt` fields updated (Epic 5 ✅)
+5. Timer counts down → Auto-advance via Cloud Function or manual advance by interviewer (Epic 5 ✅)
+6. Session ends → Summary generated → Data persisted (Epic 6)
 
 ### Authentication Flow
 1. App loads → useAuth hook initializes → Anonymous sign-in if not authenticated
@@ -312,8 +313,54 @@ interface RoomDocument {
   updatedAt: Timestamp
   magicLinkToken?: string        // Generated token
   magicLinkExpiresAt?: Timestamp // Token expiration
+  phaseStartedAt?: Timestamp     // When current phase started (for timer calculations)
 }
 ```
+
+### Timer & Phase Management Patterns (Epic 5 ✅)
+
+#### Phase Management
+- **Single source of truth**: Phase stored in Firestore `rooms/{id}.phase`
+- **Phase durations**: Tone (5 min), Coding (45 min), Reflection (10 min)
+- **Phase transitions**: Manual (interviewer) or automatic (Cloud Function)
+- **Phase validation**: Cannot skip phases or go backwards (except to 'ended')
+- **Phase timestamps**: `phaseStartedAt` tracks when current phase started for timer calculations
+
+#### Timer Calculation
+- **Server timestamp-based**: Uses `phaseStartedAt` from Firestore to handle clock skew
+- **Real-time updates**: Timer updates every second via `useTimer` hook
+- **Visual states**: Green (> 5 min), Yellow (< 5 min), Red (< 2 min)
+- **Sound alerts**: Subtle chimes at 5 min, 2 min, and 0 min remaining
+
+#### Phase-Specific UI Locking
+- **Tone phase**: Show task overview, allow video/voice setup, hide editor
+- **Coding phase**: Show full editor, enable driver/navigator switching
+- **Reflection phase**: Hide editor, show reflection form (Epic 6), disable driver switching
+- **Ended phase**: Show summary page, disable all editing
+
+#### Timer Module Structure
+```
+src/modules/timer/
+  components/
+    TimerDisplay.tsx        # Big visible countdown timer
+    PhaseControls.tsx        # Interviewer phase advance buttons
+    PhaseLock.tsx            # Phase-based conditional rendering wrapper
+  hooks/
+    useTimer.ts             # Timer state and calculations
+    usePhase.ts             # Phase state management
+    usePhaseTransition.ts   # Phase transition mutations
+    usePhaseLock.ts         # Phase-based UI restrictions
+  lib/
+    timerUtils.ts           # Timer calculation utilities
+    soundAlerts.ts          # Sound alert utilities (Web Audio API)
+  types.ts                   # Timer and phase types
+  index.ts                   # Barrel exports
+```
+
+#### Cloud Function Pattern
+- **Scheduled function**: `checkPhaseTransitions` runs every minute
+- **Auto-advance**: Checks all active rooms and advances phase when duration expires
+- **Server-side validation**: Ensures phase transitions follow correct sequence
 
 ## Testing Strategy (Future)
 - Unit tests for hooks and utilities

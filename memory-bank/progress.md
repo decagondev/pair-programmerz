@@ -63,10 +63,15 @@
 - ✅ Raise hand notification system (Liveblocks-based)
 - ✅ Migrated from Daily.co to Jitsi Meet (Dec 2025)
 
-### Epic 5: Timer & Phase Engine
-- Phase system
-- Timer with alerts
-- Phase-specific UI
+### Epic 5: Timer & Phase Engine (Completed)
+- ✅ Phase engine with server-controlled transitions
+- ✅ Phase timestamps (`phaseStartedAt`) for timer calculations
+- ✅ Big visible timer with countdown (MM:SS format)
+- ✅ Color-coded timer states (green → yellow → red)
+- ✅ Sound alerts at 5 min, 2 min, and 0 min remaining
+- ✅ Phase controls for interviewer (manual advance/end early)
+- ✅ Cloud Function for auto phase transitions
+- ✅ Phase-specific UI locking (editor hidden in reflection, driver switching disabled)
 
 ### Epic 6: Reflection & Feedback
 - Reflection form
@@ -85,7 +90,7 @@
 
 ## Current Status
 
-**Overall Progress:** ~50% (Epic 0, Epic 1, Epic 2, Epic 3, and Epic 4 completed)
+**Overall Progress:** ~62% (Epic 0, Epic 1, Epic 2, Epic 3, Epic 4, and Epic 5 completed)
 
 **Completed:**
 - Project setup (Vite, React, TypeScript)
@@ -94,9 +99,11 @@
 - Epic 1: Authentication & Magic Links (complete auth system)
 - Epic 2: Room Creation & Management (complete room management system)
 - Epic 3: Collaborative Editor (complete editor with real-time collaboration)
+- Epic 4: Video & Presence UI (Jitsi Meet integration, reactions, raise hand)
+- Epic 5: Timer & Phase Engine (phase management, timer, UI locking)
 
 **In Progress:**
-- Epic 5: Timer & Phase Engine (next)
+- Epic 6: Reflection & Feedback (next)
 
 **Blocked:**
 - None
@@ -117,5 +124,5 @@
 - None yet
 
 ## Next Milestone
-Epic 5: Timer & Phase Engine - Phase system, timer with alerts, phase-specific UI
+Epic 6: Reflection & Feedback - Reflection form, private notes, session summary
 

@@ -1,4 +1,5 @@
 import { useDriver } from '../hooks/useDriver'
+import { usePhaseLock } from '@/modules/timer'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
@@ -27,6 +28,12 @@ interface DriverControlsProps {
 export function DriverControls({ roomId, className }: DriverControlsProps) {
   const { isDriver, isInterviewer, requestControl, releaseControl, takeControl } =
     useDriver(roomId)
+  const { isDriverSwitchingLocked } = usePhaseLock(roomId ?? '')
+
+  // Don't show controls if driver switching is locked
+  if (isDriverSwitchingLocked) {
+    return null
+  }
 
   return (
     <div className={cn('flex items-center gap-2', className)}>

@@ -41,6 +41,8 @@ export interface RoomDocument {
   magicLinkExpiresAt?: Timestamp
   /** Jitsi Meet room URL (optional, deprecated - room name is derived from room ID) */
   dailyRoomUrl?: string
+  /** Timestamp when current phase started (used for timer calculations) */
+  phaseStartedAt?: Timestamp
 }
 
 /**
@@ -67,6 +69,8 @@ export interface CreateRoomInput {
  * 
  * Partial data for updating a room.
  */
+import type { FieldValue } from 'firebase/firestore'
+
 export interface UpdateRoomInput {
   phase?: RoomPhase
   participants?: string[]
@@ -74,5 +78,6 @@ export interface UpdateRoomInput {
   magicLinkToken?: string
   magicLinkExpiresAt?: Timestamp
   dailyRoomUrl?: string
+  phaseStartedAt?: Timestamp | FieldValue
 }
 

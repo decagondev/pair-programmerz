@@ -12,6 +12,7 @@
 
 import { onRequest } from 'firebase-functions/v2/https'
 import { logger } from 'firebase-functions'
+import { checkPhaseTransitions } from './phaseTransitions'
 
 /**
  * Generate magic link token
@@ -68,4 +69,7 @@ export const generateMagicLink = onRequest(
     }
   }
 )
+
+// Export phase transitions function
+export { checkPhaseTransitions }
 

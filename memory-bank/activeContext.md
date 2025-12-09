@@ -1,15 +1,15 @@
 # Active Context
 
 ## Current Work Focus
-**Epic 4: Video, Voice & Presence UI - COMPLETED**
-**Migration: Daily.co → Jitsi Meet - COMPLETED**
+**Epic 5: Timer & Phase Engine - COMPLETED**
 
-Successfully implemented complete video/voice integration with:
-- Jitsi Meet React SDK integration with auto-join and video controls
-- Floating draggable video tiles (Figma-style)
-- Screen share functionality via Jitsi External API
-- Reactions system with emoji animations (Liveblocks-based)
-- Raise hand notification system (Liveblocks-based)
+Successfully implemented complete timer and phase management system:
+- Phase engine with server-controlled transitions (Set Tone → Code → Reflection)
+- Big visible timer with countdown and color-coded states (green → yellow → red)
+- Sound alerts at 5 min, 2 min, and 0 min remaining
+- Phase-specific UI locking (editor hidden in reflection, driver switching disabled)
+- Cloud Function for auto phase transitions
+- Phase controls for interviewer (manual advance/end early)
 
 ## Recent Changes
 
@@ -43,10 +43,10 @@ Successfully implemented complete video/voice integration with:
 
 ## Next Steps
 
-### Immediate (Epic 5)
-1. Timer & Phase Engine implementation
-2. Phase transitions (Set Tone → Code → Reflection)
-3. Big visible timer with sound alerts
+### Immediate (Epic 6)
+1. Reflection form for candidates
+2. Private notes for interviewers
+3. Session summary page with PDF export
 
 ## Active Decisions
 
