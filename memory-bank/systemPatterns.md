@@ -362,6 +362,61 @@ src/modules/timer/
 - **Auto-advance**: Checks all active rooms and advances phase when duration expires
 - **Server-side validation**: Ensures phase transitions follow correct sequence
 
+### Feedback & Reflection Patterns (Epic 6 ✅)
+
+#### Feedback Module Structure
+```
+src/modules/feedback/
+  components/
+    ReflectionForm.tsx        # Candidate reflection form
+    PrivateNotes.tsx           # Interviewer private notes editor
+    SessionSummary.tsx          # Session summary page
+  hooks/
+    useReflection.ts           # Reflection data hook
+    usePrivateNotes.ts         # Private notes data hook
+    useSessionSummary.ts       # Summary aggregation hook
+  lib/
+    pdfGenerator.tsx           # PDF generation utility
+  types.ts                     # Feedback type definitions
+  index.ts                     # Barrel exports
+```
+
+#### Firestore Subcollection Pattern
+- **Reflections**: `rooms/{roomId}/reflections/{userId}`
+  - Candidates write their own reflection
+  - Both participants can read
+  - Auto-save with debouncing (500ms)
+  - Real-time subscriptions via Firestore onSnapshot
+- **Private Notes**: `rooms/{roomId}/privateNotes/{userId}`
+  - Only interviewer (creator) can read/write
+  - Auto-save with debouncing (500ms)
+  - Real-time subscriptions via Firestore onSnapshot
+
+#### Reflection Form Pattern
+- **Phase-aware**: Only shown during 'reflection' phase (via `usePhaseLock`)
+- **Auto-save**: Debounced save (500ms) on typing + immediate save on blur
+- **Validation**: Zod schema with react-hook-form
+- **Questions**: Configurable via `DEFAULT_REFLECTION_QUESTIONS` (5 questions)
+- **Real-time sync**: Firestore subscriptions with TanStack Query cache updates
+
+#### Private Notes Pattern
+- **Role-based**: Visible only to interviewers (via `useRole` hook)
+- **Always available**: Not locked to any specific phase
+- **Auto-save**: Debounced save (500ms) on typing + immediate save on blur
+- **Simple editor**: Textarea component (can be upgraded to TipTap in future)
+
+#### Session Summary Pattern
+- **Aggregation**: Combines room data, reflection responses, and private notes
+- **PDF export**: Uses `@react-pdf/renderer` for downloadable PDFs
+- **Route**: `/room/:roomId/summary` (accessible when phase is 'ended')
+- **Access control**: Both candidate and interviewer can view summary
+
+#### Auto-Save Pattern
+- **Debouncing**: 500ms delay to reduce Firestore writes
+- **Immediate save**: On field blur for better UX
+- **Optimistic updates**: TanStack Query cache updates on subscription
+- **Error handling**: Console errors, user can manually retry
+
 ## Testing Strategy (Future)
 - Unit tests for hooks and utilities
 - Integration tests for module interactions

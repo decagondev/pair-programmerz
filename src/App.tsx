@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, useParams } from 'react-router-dom'
 import { JoinPage, AuthProvider, RequireAuth, RequireRole } from '@/modules/auth'
 import { DashboardLayout } from '@/modules/dashboard'
 import { EditorLayout } from '@/modules/editor'
+import { SessionSummary } from '@/modules/feedback'
 
 /**
  * Landing page component
@@ -44,6 +45,29 @@ function RoomPage() {
 }
 
 /**
+ * Summary page component
+ * 
+ * Displays session summary with reflection responses and private notes.
+ * Accessible when phase is 'ended'.
+ */
+function SummaryPage() {
+  const { roomId } = useParams<{ roomId: string }>()
+
+  if (!roomId) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-semibold">Room not found</h1>
+          <p className="text-muted-foreground">Invalid room ID</p>
+        </div>
+      </div>
+    )
+  }
+
+  return <SessionSummary roomId={roomId} />
+}
+
+/**
  * Main App component
  * 
  * Sets up routing for the application with authentication and role-based protection.
@@ -73,6 +97,14 @@ function App() {
             element={
               <RequireAuth>
                 <RoomPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/room/:roomId/summary"
+            element={
+              <RequireAuth>
+                <SummaryPage />
               </RequireAuth>
             }
           />

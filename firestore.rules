@@ -53,6 +53,48 @@ service cloud.firestore {
       
       // Delete: Only creator can delete rooms
       allow delete: if request.auth != null && isCreator();
+      
+      /**
+       * Reflections subcollection
+       * 
+       * Security rules for candidate reflection responses.
+       * Candidates can write their own reflection, both participants can read.
+       */
+      match /reflections/{userId} {
+        // Helper function to check if user is a participant in the parent room
+        function isParticipantInRoom() {
+          return request.auth != null && 
+            (get(/databases/$(database)/documents/rooms/$(roomId)).data.createdBy == request.auth.uid || 
+             request.auth.uid in get(/databases/$(database)/documents/rooms/$(roomId)).data.participants);
+        }
+        
+        // Write: Candidate can write their own reflection
+        allow write: if request.auth != null && 
+          request.auth.uid == userId &&
+          isParticipantInRoom();
+        
+        // Read: Both participants can read reflections
+        allow read: if request.auth != null && isParticipantInRoom();
+      }
+      
+      /**
+       * Private Notes subcollection
+       * 
+       * Security rules for interviewer private notes.
+       * Only interviewer (creator) can read/write their own notes.
+       */
+      match /privateNotes/{userId} {
+        // Helper function to check if user is the creator (interviewer) of the parent room
+        function isCreatorOfRoom() {
+          return request.auth != null && 
+            get(/databases/$(database)/documents/rooms/$(roomId)).data.createdBy == request.auth.uid;
+        }
+        
+        // Read/Write: Only interviewer (creator) can read/write their own notes
+        allow read, write: if request.auth != null && 
+          request.auth.uid == userId &&
+          isCreatorOfRoom();
+      }
     }
     
     /**

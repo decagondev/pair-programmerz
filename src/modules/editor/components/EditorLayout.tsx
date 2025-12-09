@@ -3,7 +3,9 @@ import { useDriver } from '../hooks/useDriver'
 import { useFileTree } from '../hooks/useFileTree'
 import { VideoGrid, VideoControls, ReactionBar, ReactionAnimation, RaiseHandButton, RaiseHandNotification } from '@/modules/video'
 import { TimerDisplay, PhaseControls, usePhaseLock } from '@/modules/timer'
+import { ReflectionForm, PrivateNotes } from '@/modules/feedback'
 import { useAuth } from '@/modules/auth'
+import { useRole } from '@/modules/auth'
 import { useUserStore } from '@/modules/store'
 import { cn } from '@/lib/utils'
 
@@ -33,6 +35,8 @@ function EditorLayoutContent({ roomId, className }: EditorLayoutProps) {
   const { isDriver } = useDriver(roomId)
   const { activeFile, getFileContent } = useFileTree(roomId)
   const { isEditorLocked } = usePhaseLock(roomId)
+  const { role } = useRole(roomId)
+  const isInterviewer = role === 'interviewer'
 
   const fileContent = activeFile ? getFileContent(activeFile) : ''
 
@@ -71,14 +75,7 @@ function EditorLayoutContent({ roomId, className }: EditorLayoutProps) {
         </aside>
         <main className="flex-1 overflow-hidden">
           {isEditorLocked ? (
-            <div className="flex h-full items-center justify-center">
-              <div className="text-center">
-                <h2 className="text-xl font-semibold">Reflection Phase</h2>
-                <p className="text-muted-foreground">
-                  The coding phase has ended. Please complete the reflection form.
-                </p>
-              </div>
-            </div>
+            <ReflectionForm roomId={roomId} />
           ) : (
             <CodeEditor
               fileContent={fileContent}
@@ -91,9 +88,16 @@ function EditorLayoutContent({ roomId, className }: EditorLayoutProps) {
           )}
         </main>
         <aside className="w-80 border-l bg-muted/50">
-          <div className="h-full p-2">
-            <h2 className="mb-2 text-sm font-semibold">Video</h2>
-            <VideoGrid roomId={roomId} className="h-full" />
+          <div className="flex h-full flex-col gap-2 p-2">
+            <div className="flex-1">
+              <h2 className="mb-2 text-sm font-semibold">Video</h2>
+              <VideoGrid roomId={roomId} className="h-full" />
+            </div>
+            {isInterviewer && (
+              <div className="h-80 shrink-0">
+                <PrivateNotes roomId={roomId} />
+              </div>
+            )}
           </div>
         </aside>
       </div>

@@ -73,10 +73,14 @@
 - ✅ Cloud Function for auto phase transitions
 - ✅ Phase-specific UI locking (editor hidden in reflection, driver switching disabled)
 
-### Epic 6: Reflection & Feedback
-- Reflection form
-- Private notes
-- Session summary
+### Epic 6: Reflection & Feedback (Completed)
+- ✅ Candidate reflection form with auto-save and validation
+- ✅ Interviewer private notes editor with auto-save
+- ✅ Session summary page with aggregated data
+- ✅ PDF export functionality
+- ✅ Firestore subcollections with security rules
+- ✅ Phase-aware UI rendering
+- ✅ Role-based access control
 
 ### Epic 7: Task Library
 - Task CRUD
@@ -90,7 +94,7 @@
 
 ## Current Status
 
-**Overall Progress:** ~62% (Epic 0, Epic 1, Epic 2, Epic 3, Epic 4, and Epic 5 completed)
+**Overall Progress:** ~75% (Epic 0, Epic 1, Epic 2, Epic 3, Epic 4, Epic 5, and Epic 6 completed)
 
 **Completed:**
 - Project setup (Vite, React, TypeScript)
@@ -101,9 +105,10 @@
 - Epic 3: Collaborative Editor (complete editor with real-time collaboration)
 - Epic 4: Video & Presence UI (Jitsi Meet integration, reactions, raise hand)
 - Epic 5: Timer & Phase Engine (phase management, timer, UI locking)
+- Epic 6: Reflection & Feedback (reflection forms, private notes, session summary, PDF export)
 
 **In Progress:**
-- Epic 6: Reflection & Feedback (next)
+- Epic 7: Task Library (next)
 
 **Blocked:**
 - None
@@ -124,5 +129,5 @@
 - None yet
 
 ## Next Milestone
-Epic 6: Reflection & Feedback - Reflection form, private notes, session summary
+Epic 7: Task Library - Task CRUD for admins, seed real production tasks
 

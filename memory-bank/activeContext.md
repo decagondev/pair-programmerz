@@ -1,15 +1,16 @@
 # Active Context
 
 ## Current Work Focus
-**Epic 5: Timer & Phase Engine - COMPLETED**
+**Epic 6: Reflection & Feedback - COMPLETED**
 
-Successfully implemented complete timer and phase management system:
-- Phase engine with server-controlled transitions (Set Tone → Code → Reflection)
-- Big visible timer with countdown and color-coded states (green → yellow → red)
-- Sound alerts at 5 min, 2 min, and 0 min remaining
-- Phase-specific UI locking (editor hidden in reflection, driver switching disabled)
-- Cloud Function for auto phase transitions
-- Phase controls for interviewer (manual advance/end early)
+Successfully implemented complete feedback capture system:
+- Candidate reflection form with auto-save and validation (5 open-ended questions)
+- Interviewer private notes editor with auto-save (visible only to interviewers)
+- Session summary page with aggregated data (reflection + notes + room metadata)
+- PDF export functionality using @react-pdf/renderer
+- Firestore subcollections for reflections and privateNotes with security rules
+- Phase-aware UI (reflection form shown only in reflection phase)
+- Role-based access control (private notes visible only to interviewers)
 
 ## Recent Changes
 
@@ -43,10 +44,9 @@ Successfully implemented complete timer and phase management system:
 
 ## Next Steps
 
-### Immediate (Epic 6)
-1. Reflection form for candidates
-2. Private notes for interviewers
-3. Session summary page with PDF export
+### Immediate (Epic 7)
+1. Task CRUD for admins
+2. Seed real production tasks in Firestore
 
 ## Active Decisions
 
