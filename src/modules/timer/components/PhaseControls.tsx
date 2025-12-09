@@ -81,7 +81,7 @@ export function PhaseControls({ roomId, className }: PhaseControlsProps) {
   return (
     <div className={cn('flex items-center gap-2', className)}>
       {phase && phase !== 'ended' && (
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground" role="status" aria-live="polite" aria-atomic="true">
           <span>Phase: {getPhaseLabel(phase)}</span>
         </div>
       )}

@@ -1,6 +1,5 @@
 import { sampleTasks } from '@/data/sampleTasks'
 import { createTaskWithId, getTaskById } from './tasks'
-import { useAuth } from '@/modules/auth'
 
 /**
  * Seed tasks from sample tasks

@@ -1,5 +1,4 @@
 import { useTasks as useTasksQuery } from '@/modules/task'
-import type { TaskDocumentWithId } from '@/modules/task/types'
 import type { Task } from '@/data/sampleTasks'
 
 /**

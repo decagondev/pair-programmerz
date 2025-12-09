@@ -44,6 +44,10 @@ export function DriverIndicator({ roomId, className }: DriverIndicatorProps) {
         isDriver ? 'bg-green-500/10 border-green-500/20' : 'bg-muted border-border',
         className
       )}
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+      aria-label={isDriver ? 'You are currently driving' : 'You are currently navigating'}
     >
       <div className="flex items-center gap-3">
         <div

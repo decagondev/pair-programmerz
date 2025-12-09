@@ -1,9 +1,26 @@
+import { Suspense, lazy } from 'react'
 import { BrowserRouter, Routes, Route, useParams } from 'react-router-dom'
 import { JoinPage, AuthProvider, RequireAuth, RequireRole, RequireAdmin } from '@/modules/auth'
-import { DashboardLayout } from '@/modules/dashboard'
-import { EditorLayout } from '@/modules/editor'
-import { SessionSummary } from '@/modules/feedback'
-import { AdminTasksPage } from '@/modules/task'
+
+// Lazy load major routes for code splitting
+const DashboardLayout = lazy(() => import('@/modules/dashboard').then(m => ({ default: m.DashboardLayout })))
+const EditorLayout = lazy(() => import('@/modules/editor').then(m => ({ default: m.EditorLayout })))
+const SessionSummary = lazy(() => import('@/modules/feedback').then(m => ({ default: m.SessionSummary })))
+const AdminTasksPage = lazy(() => import('@/modules/task').then(m => ({ default: m.AdminTasksPage })))
+
+/**
+ * Loading fallback component
+ */
+function LoadingFallback() {
+  return (
+    <div className="flex min-h-screen flex-col items-center justify-center">
+      <div className="text-center">
+        <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+        <p className="text-muted-foreground">Loading...</p>
+      </div>
+    </div>
+  )
+}
 
 /**
  * Landing page component
@@ -42,7 +59,11 @@ function RoomPage() {
     )
   }
 
-  return <EditorLayout roomId={roomId} />
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <EditorLayout roomId={roomId} />
+    </Suspense>
+  )
 }
 
 /**
@@ -65,7 +86,11 @@ function SummaryPage() {
     )
   }
 
-  return <SessionSummary roomId={roomId} />
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <SessionSummary roomId={roomId} />
+    </Suspense>
+  )
 }
 
 /**
@@ -77,6 +102,13 @@ function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
+        {/* Skip to main content link for screen readers */}
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
+        >
+          Skip to main content
+        </a>
         <Routes>
           {/* Public routes */}
           <Route path="/" element={<HomePage />} />
@@ -88,7 +120,9 @@ function App() {
             element={
               <RequireAuth>
                 <RequireRole requiredRole="interviewer">
-                  <DashboardLayout />
+                  <Suspense fallback={<LoadingFallback />}>
+                    <DashboardLayout />
+                  </Suspense>
                 </RequireRole>
               </RequireAuth>
             }
@@ -97,7 +131,9 @@ function App() {
             path="/room/:roomId"
             element={
               <RequireAuth>
-                <RoomPage />
+                <Suspense fallback={<LoadingFallback />}>
+                  <RoomPage />
+                </Suspense>
               </RequireAuth>
             }
           />
@@ -105,7 +141,9 @@ function App() {
             path="/room/:roomId/summary"
             element={
               <RequireAuth>
-                <SummaryPage />
+                <Suspense fallback={<LoadingFallback />}>
+                  <SummaryPage />
+                </Suspense>
               </RequireAuth>
             }
           />
@@ -114,7 +152,9 @@ function App() {
             element={
               <RequireAuth>
                 <RequireAdmin>
-                  <AdminTasksPage />
+                  <Suspense fallback={<LoadingFallback />}>
+                    <AdminTasksPage />
+                  </Suspense>
                 </RequireAdmin>
               </RequireAuth>
             }

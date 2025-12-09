@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { useReactions } from '../hooks/useReactions'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -31,7 +32,7 @@ interface ReactionButtonProps {
  * 
  * @param props - Component props
  */
-export function ReactionButton({
+export const ReactionButton = memo(function ReactionButton({
   roomId,
   emoji,
   className,
@@ -56,7 +57,7 @@ export function ReactionButton({
       {emoji}
     </Button>
   )
-}
+})
 
 /**
  * Props for ReactionBar component

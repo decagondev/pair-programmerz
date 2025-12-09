@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/select'
 import { Loader2 } from 'lucide-react'
 import type { CreateTaskInput, UpdateTaskInput, TaskDocumentWithId } from '../types'
+import { useKeyboardShortcut } from '@/hooks/useKeyboardShortcut'
 
 /**
  * Task form schema
@@ -80,6 +81,26 @@ export function TaskForm({ task, onSubmit, onCancel, isLoading }: TaskFormProps)
     await onSubmit(data)
   }
 
+  // Keyboard shortcut: Cmd/Ctrl + Enter to submit
+  useKeyboardShortcut(
+    ['Meta', 'Enter'],
+    () => {
+      if (!isLoading) {
+        handleSubmit(onFormSubmit)()
+      }
+    },
+    { enabled: true }
+  )
+  useKeyboardShortcut(
+    ['Control', 'Enter'],
+    () => {
+      if (!isLoading) {
+        handleSubmit(onFormSubmit)()
+      }
+    },
+    { enabled: true }
+  )
+
   return (
     <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-4">
       {/* Title */}
@@ -91,6 +112,7 @@ export function TaskForm({ task, onSubmit, onCancel, isLoading }: TaskFormProps)
           id="title"
           {...register('title')}
           placeholder="Task title"
+          className="w-full min-h-[44px]"
           aria-invalid={errors.title ? 'true' : 'false'}
         />
         {errors.title && (
@@ -116,7 +138,7 @@ export function TaskForm({ task, onSubmit, onCancel, isLoading }: TaskFormProps)
       </div>
 
       {/* Difficulty and Language */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="space-y-2">
           <label htmlFor="difficulty" className="text-sm font-medium">
             Difficulty
@@ -125,7 +147,7 @@ export function TaskForm({ task, onSubmit, onCancel, isLoading }: TaskFormProps)
             value={difficulty}
             onValueChange={(value) => setValue('difficulty', value as 'easy' | 'medium' | 'hard')}
           >
-            <SelectTrigger id="difficulty">
+            <SelectTrigger id="difficulty" className="w-full min-h-[44px]">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -146,7 +168,7 @@ export function TaskForm({ task, onSubmit, onCancel, isLoading }: TaskFormProps)
               setValue('language', value as 'typescript' | 'javascript' | 'python' | 'java')
             }
           >
-            <SelectTrigger id="language">
+            <SelectTrigger id="language" className="w-full min-h-[44px]">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -170,6 +192,7 @@ export function TaskForm({ task, onSubmit, onCancel, isLoading }: TaskFormProps)
           min="1"
           {...register('estimatedTime', { valueAsNumber: true })}
           placeholder="30"
+          className="w-full min-h-[44px]"
           aria-invalid={errors.estimatedTime ? 'true' : 'false'}
         />
         {errors.estimatedTime && (
@@ -192,13 +215,23 @@ export function TaskForm({ task, onSubmit, onCancel, isLoading }: TaskFormProps)
       </div>
 
       {/* Actions */}
-      <div className="flex justify-end gap-2 pt-4">
+      <div className="flex flex-col-reverse gap-2 pt-4 sm:flex-row sm:justify-end">
         {onCancel && (
-          <Button type="button" variant="outline" onClick={onCancel} disabled={isLoading}>
+          <Button 
+            type="button" 
+            variant="outline" 
+            onClick={onCancel} 
+            disabled={isLoading}
+            className="min-h-[44px] w-full sm:w-auto"
+          >
             Cancel
           </Button>
         )}
-        <Button type="submit" disabled={isLoading}>
+        <Button 
+          type="submit" 
+          disabled={isLoading}
+          className="min-h-[44px] w-full sm:w-auto"
+        >
           {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           {task ? 'Update Task' : 'Create Task'}
         </Button>

@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { useDraggable, type Position } from '../hooks/useDraggable'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
@@ -46,7 +47,7 @@ interface FloatingVideoTileProps {
  * 
  * @param props - Component props
  */
-export function FloatingVideoTile({
+export const FloatingVideoTile = memo(function FloatingVideoTile({
   participant,
   initialPosition = { x: 0, y: 0 },
   draggable = true,
@@ -139,5 +140,5 @@ export function FloatingVideoTile({
       </div>
     </div>
   )
-}
+})
 

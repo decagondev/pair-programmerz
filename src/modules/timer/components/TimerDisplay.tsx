@@ -51,8 +51,12 @@ export function TimerDisplay({ roomId, className }: TimerDisplayProps) {
         'flex items-center gap-2 rounded-lg border bg-background px-4 py-2',
         className
       )}
+      role="timer"
+      aria-live="polite"
+      aria-atomic="true"
+      aria-label={`Time remaining: ${formattedTime}`}
     >
-      <Clock className={cn('h-5 w-5', colorClass)} />
+      <Clock className={cn('h-5 w-5', colorClass)} aria-hidden="true" />
       <span
         className={cn(
           'text-2xl font-mono font-bold tabular-nums',

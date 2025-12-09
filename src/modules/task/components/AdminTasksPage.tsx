@@ -21,9 +21,9 @@ export function AdminTasksPage() {
   const createTask = useCreateTask()
   const updateTask = useUpdateTask()
 
-  const handleCreate = async (data: CreateTaskInput) => {
+  const handleCreate = async (data: CreateTaskInput | UpdateTaskInput) => {
     try {
-      await createTask.mutateAsync(data)
+      await createTask.mutateAsync(data as CreateTaskInput)
       setIsCreateDialogOpen(false)
     } catch (error) {
       console.error('Failed to create task:', error)

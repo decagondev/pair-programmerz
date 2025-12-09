@@ -1,7 +1,10 @@
-import { JitsiMeeting } from '@jitsi/react-sdk'
+import { lazy, Suspense } from 'react'
 import { useJitsiCall } from '../hooks/useJitsiCall'
 import { jitsiDomain, defaultJitsiConfig, defaultJitsiInterfaceConfig } from '@/modules/config'
 import { cn } from '@/lib/utils'
+
+// Lazy load Jitsi SDK to reduce initial bundle size
+const JitsiMeeting = lazy(() => import('@jitsi/react-sdk').then(m => ({ default: m.JitsiMeeting })))
 
 /**
  * Props for JitsiVideo component
@@ -121,24 +124,35 @@ export function JitsiVideo({
 
   return (
     <div className={cn('relative h-full w-full overflow-hidden rounded-lg bg-black', className)}>
-      <JitsiMeeting
-        domain={jitsiDomain}
-        roomName={roomId}
-        configOverwrite={{
-          ...defaultJitsiConfig,
-          startWithAudioMuted,
-          startWithVideoMuted,
-        }}
-        interfaceConfigOverwrite={defaultJitsiInterfaceConfig}
-        onApiReady={handleApiReady}
-        getIFrameRef={(iframeRef) => {
-          if (iframeRef) {
-            iframeRef.style.height = '100%'
-            iframeRef.style.width = '100%'
-            iframeRef.style.border = 'none'
-          }
-        }}
-      />
+      <Suspense
+        fallback={
+          <div className="flex h-full items-center justify-center">
+            <div className="text-center">
+              <div className="mx-auto mb-2 h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+              <p className="text-xs text-muted-foreground">Loading video...</p>
+            </div>
+          </div>
+        }
+      >
+        <JitsiMeeting
+          domain={jitsiDomain}
+          roomName={roomId}
+          configOverwrite={{
+            ...defaultJitsiConfig,
+            startWithAudioMuted,
+            startWithVideoMuted,
+          }}
+          interfaceConfigOverwrite={defaultJitsiInterfaceConfig}
+          onApiReady={handleApiReady}
+          getIFrameRef={(iframeRef) => {
+            if (iframeRef) {
+              iframeRef.style.height = '100%'
+              iframeRef.style.width = '100%'
+              iframeRef.style.border = 'none'
+            }
+          }}
+        />
+      </Suspense>
     </div>
   )
 }

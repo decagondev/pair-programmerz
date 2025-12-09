@@ -14,16 +14,20 @@ export function DashboardLayout() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-4 md:py-8">
         {/* Header */}
-        <div className="mb-8 flex items-center justify-between">
+        <div className="mb-6 flex flex-col gap-4 md:mb-8 md:flex-row md:items-center md:justify-between">
           <div>
-            <h1 className="text-3xl font-bold">Interview Dashboard</h1>
-            <p className="text-muted-foreground mt-1">
+            <h1 className="text-2xl font-bold md:text-3xl">Interview Dashboard</h1>
+            <p className="text-muted-foreground mt-1 text-sm md:text-base">
               Manage your interview rooms
             </p>
           </div>
-          <Button onClick={() => setIsCreateDialogOpen(true)}>
+          <Button 
+            onClick={() => setIsCreateDialogOpen(true)}
+            className="min-h-[44px] w-full md:w-auto"
+            size="lg"
+          >
             <Plus className="h-4 w-4 mr-2" />
             Create Room
           </Button>

@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Calendar, Users, Clock } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -17,7 +18,7 @@ interface RoomCardProps {
   room: RoomDocumentWithId
 }
 
-export function RoomCard({ room }: RoomCardProps) {
+export const RoomCard = memo(function RoomCard({ room }: RoomCardProps) {
   const navigate = useNavigate()
 
   const handleClick = () => {
@@ -109,5 +110,5 @@ export function RoomCard({ room }: RoomCardProps) {
       </CardContent>
     </Card>
   )
-}
+})
 

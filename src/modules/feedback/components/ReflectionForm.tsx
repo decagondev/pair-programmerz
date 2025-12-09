@@ -9,6 +9,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Loader2, Save } from 'lucide-react'
 import type { ReflectionResponse } from '../types'
+import { useKeyboardShortcut } from '@/hooks/useKeyboardShortcut'
 
 /**
  * Reflection form schema
@@ -141,6 +142,26 @@ export function ReflectionForm({ roomId }: ReflectionFormProps) {
     }
   }
 
+  // Keyboard shortcut: Cmd/Ctrl + Enter to submit
+  useKeyboardShortcut(
+    ['Meta', 'Enter'],
+    () => {
+      if (!isSaving) {
+        handleSubmit(onSubmit)()
+      }
+    },
+    { enabled: true }
+  )
+  useKeyboardShortcut(
+    ['Control', 'Enter'],
+    () => {
+      if (!isSaving) {
+        handleSubmit(onSubmit)()
+      }
+    },
+    { enabled: true }
+  )
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -210,7 +231,11 @@ export function ReflectionForm({ roomId }: ReflectionFormProps) {
             })}
 
             <div className="flex justify-end gap-2 pt-4">
-              <Button type="submit" disabled={isSaving || !isDirty}>
+              <Button 
+                type="submit" 
+                disabled={isSaving || !isDirty}
+                className="min-h-[44px] w-full sm:w-auto"
+              >
                 {isSaving ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />

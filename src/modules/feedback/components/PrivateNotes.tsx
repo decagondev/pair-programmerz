@@ -3,6 +3,7 @@ import { usePrivateNotes } from '../hooks/usePrivateNotes'
 import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Loader2, Save } from 'lucide-react'
+import { useKeyboardShortcut } from '@/hooks/useKeyboardShortcut'
 
 /**
  * Props for PrivateNotes component
@@ -97,6 +98,26 @@ export function PrivateNotes({ roomId }: PrivateNotesProps) {
       console.error('Failed to save private notes:', error)
     }
   }
+
+  // Keyboard shortcut: Cmd/Ctrl + Enter to save
+  useKeyboardShortcut(
+    ['Meta', 'Enter'],
+    () => {
+      if (!isSaving) {
+        handleSave()
+      }
+    },
+    { enabled: true }
+  )
+  useKeyboardShortcut(
+    ['Control', 'Enter'],
+    () => {
+      if (!isSaving) {
+        handleSave()
+      }
+    },
+    { enabled: true }
+  )
 
   if (isLoading) {
     return (

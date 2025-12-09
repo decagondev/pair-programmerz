@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/select'
 import { Loader2 } from 'lucide-react'
 import type { Task } from '@/data/sampleTasks'
+import { useKeyboardShortcut } from '@/hooks/useKeyboardShortcut'
 
 /**
  * Create room form schema
@@ -60,6 +61,26 @@ export function CreateRoomForm({ onSuccess }: CreateRoomFormProps) {
     }
   }
 
+  // Keyboard shortcut: Cmd/Ctrl + Enter to submit
+  useKeyboardShortcut(
+    ['Meta', 'Enter'],
+    () => {
+      if (!createRoom.isPending) {
+        handleSubmit(onSubmit)()
+      }
+    },
+    { enabled: true }
+  )
+  useKeyboardShortcut(
+    ['Control', 'Enter'],
+    () => {
+      if (!createRoom.isPending) {
+        handleSubmit(onSubmit)()
+      }
+    },
+    { enabled: true }
+  )
+
   if (tasksLoading) {
     return (
       <div className="flex items-center justify-center py-8">
@@ -78,7 +99,7 @@ export function CreateRoomForm({ onSuccess }: CreateRoomFormProps) {
           value={selectedTaskId || ''}
           onValueChange={(value) => setValue('taskId', value || null)}
         >
-          <SelectTrigger id="taskId">
+          <SelectTrigger id="taskId" className="w-full min-h-[44px]">
             <SelectValue placeholder="Choose a task or leave blank" />
           </SelectTrigger>
           <SelectContent>
@@ -100,16 +121,21 @@ export function CreateRoomForm({ onSuccess }: CreateRoomFormProps) {
         )}
       </div>
 
-      <div className="flex justify-end gap-2 pt-4">
+      <div className="flex flex-col-reverse gap-2 pt-4 sm:flex-row sm:justify-end">
         <Button
           type="button"
           variant="outline"
           onClick={() => onSuccess?.()}
           disabled={createRoom.isPending}
+          className="min-h-[44px] w-full sm:w-auto"
         >
           Cancel
         </Button>
-        <Button type="submit" disabled={createRoom.isPending}>
+        <Button 
+          type="submit" 
+          disabled={createRoom.isPending}
+          className="min-h-[44px] w-full sm:w-auto"
+        >
           {createRoom.isPending ? (
             <>
               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
