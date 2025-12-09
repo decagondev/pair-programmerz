@@ -73,9 +73,15 @@ Each module owns:
 - **CodeMirror 6** - Editor with Yjs binding
 
 ### Authentication
-- **Firebase Auth** - Anonymous + Email magic links
-- **Custom tokens** - Cloud Functions for role-based access
-- **Firestore security rules** - Enforce access control
+- **Firebase Auth** - Anonymous authentication
+  - Anonymous sign-in on app load (automatic)
+  - Magic link tokens generated server-side via Cloud Function (not Firebase's built-in email auth)
+  - Custom tokens via Cloud Functions (placeholder for generateMagicLink)
+  - Note: `sendPasswordlessEmail` doesn't exist in Firebase Auth - magic links are generated server-side
+- **Protected Routes** - RequireAuth and RequireRole components
+- **Role Detection** - useRole hook queries Firestore room documents
+- **Auth State** - Synced between Firebase Auth and Zustand store
+- **Firestore security rules** - Enforce access control (to be implemented in Epic 2)
 
 ### Video/Voice
 - **Daily.co** - Primary video/voice provider
@@ -113,11 +119,20 @@ export const useUserStore = create<UserSlice>()((set) => ({
 ## Data Flow
 
 ### Room Lifecycle
-1. Interviewer creates room → Firestore `rooms/{id}` created
-2. Magic link generated → Cloud Function creates token
-3. Candidate joins → Validates token → Signs in → Joins Liveblocks room
-4. Phase transitions → Firestore `phase` field updated
-5. Session ends → Summary generated → Data persisted
+1. Interviewer creates room → Firestore `rooms/{id}` created (Epic 2)
+2. Magic link generated → Cloud Function creates token (placeholder in Epic 1)
+3. Candidate joins → Validates token → Signs in → Redirects to room (Epic 1 ✅)
+4. Phase transitions → Firestore `phase` field updated (Epic 5)
+5. Session ends → Summary generated → Data persisted (Epic 6)
+
+### Authentication Flow
+1. App loads → useAuth hook initializes → Anonymous sign-in if not authenticated
+2. User state synced to Zustand store (user ID, email, role, displayName)
+3. Protected routes check auth via RequireAuth component
+4. Role-based routes check role via RequireRole component (queries Firestore)
+5. Magic link flow: `/join/:token` → Validate token → Sign in → Redirect to room
+   - Magic links are generated server-side via Cloud Function (not Firebase's built-in email auth)
+   - Token validation happens client-side, actual sign-in will use Cloud Function to exchange token
 
 ### Real-Time Sync
 1. Code changes → Yjs document updated
@@ -139,9 +154,43 @@ modules/ → hooks/ → lib/
 modules/ → types/ → (no dependencies)
 ```
 
+## Authentication Patterns
+
+### Auth Module Structure
+```
+src/modules/auth/
+  hooks/
+    useAuth.ts          # Main auth hook (Firebase auth state)
+    useMagicLink.ts      # Magic link validation and sign-in
+    useRole.ts           # Role detection from Firestore
+  components/
+    JoinPage.tsx         # Magic link join page
+    RequireAuth.tsx      # Route protection component
+    RequireRole.tsx      # Role-based route protection
+    AuthProvider.tsx     # App-wide auth initialization
+  types.ts               # Auth types (AuthUser, AuthState, etc.)
+  index.ts               # Barrel exports
+```
+
+### Protected Route Pattern
+```typescript
+<RequireAuth>
+  <RequireRole requiredRole="interviewer">
+    <DashboardPage />
+  </RequireRole>
+</RequireAuth>
+```
+
+### Role Detection Pattern
+- useRole hook queries Firestore `rooms/{roomId}` document
+- Checks `createdBy` field for interviewer role
+- Checks `participants` array for candidate role
+- Caches role in component state (not in Zustand to avoid circular deps)
+
 ## Testing Strategy (Future)
 - Unit tests for hooks and utilities
 - Integration tests for module interactions
-- E2E tests for critical flows (room creation, code sync)
+- E2E tests for critical flows (room creation, code sync, auth flow)
 - Firebase emulator for Firestore rules testing
+- Auth flow testing (anonymous sign-in, magic link validation)
 

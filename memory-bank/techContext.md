@@ -8,6 +8,7 @@
 - **TypeScript 5.9+** - Type safety (strict mode)
 - **Tailwind CSS v4** - Styling
 - **shadcn/ui** - Component library
+- **React Router DOM** - Client-side routing
 
 ### Backend & Services
 - **Firebase v9+ (modular)**
@@ -60,11 +61,19 @@ VITE_DAILY_DOMAIN=
 /
   .cursor/rules/        # Cursor IDE rules
   memory-bank/          # Project documentation
+  functions/            # Firebase Cloud Functions
+    src/
+      index.ts          # Cloud Functions (generateMagicLink placeholder)
   src/
     modules/            # Feature modules (main code)
+      auth/             # Authentication module (Epic 1 ✅)
+      config/           # Configuration modules
+      store/            # Zustand store
+      ...               # Other modules (room, editor, etc.)
     hooks/              # Shared custom hooks
     types/              # Global TypeScript types
     lib/                # Utilities (firebase, liveblocks, daily)
+      firebase/         # Firebase utilities (auth, magicLink, roles)
     components/         # shadcn/ui components
     data/               # Sample data
   docs/                 # PRD, TASKS
@@ -84,6 +93,8 @@ VITE_DAILY_DOMAIN=
 - **No relative imports going up** - Use `@/` instead of `../`
 - **Feature-sliced design** - Modules are self-contained
 - **SOLID principles** - Applied throughout
+- **TypeScript strict mode** - All build errors resolved, build passes successfully
+- **Unused parameter convention** - Prefix unused parameters with `_` (e.g., `_email`, `_uid`)
 
 ### Performance
 - **Code splitting** - Lazy load routes and heavy components
@@ -104,12 +115,13 @@ VITE_DAILY_DOMAIN=
 {
   "react": "^19.2.0",
   "react-dom": "^19.2.0",
-  "firebase": "^10.x.x",
-  "@liveblocks/client": "^1.x.x",
-  "@daily-co/daily-js": "^0.x.x",
-  "zustand": "^4.x.x",
+  "react-router-dom": "^6.x.x",
+  "firebase": "^12.6.0",
+  "@liveblocks/client": "^3.11.1",
+  "@daily-co/daily-js": "^0.85.0",
+  "zustand": "^5.0.9",
   "@tanstack/react-query": "^5.x.x",
-  "zod": "^3.x.x",
+  "zod": "^4.1.13",
   "clsx": "^2.1.1",
   "tailwind-merge": "^3.4.0",
   "lucide-react": "^0.556.0"

@@ -6,7 +6,17 @@
  * @module auth
  */
 
-// Module exports will be added here as they are implemented
-// Example: export { useAuth } from './hooks/useAuth'
-// Example: export type { User } from './types'
+// Hooks
+export { useAuth } from './hooks/useAuth'
+export { useMagicLink } from './hooks/useMagicLink'
+export { useRole } from './hooks/useRole'
+
+// Components
+export { JoinPage } from './components/JoinPage'
+export { RequireAuth } from './components/RequireAuth'
+export { RequireRole } from './components/RequireRole'
+export { AuthProvider } from './components/AuthProvider'
+
+// Types
+export type { AuthUser, AuthState, MagicLinkTokenClaims, MagicLinkValidationResult } from './types'
 

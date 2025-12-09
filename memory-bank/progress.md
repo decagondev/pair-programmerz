@@ -7,19 +7,27 @@
 - ✅ Path alias `@/` configured
 - ✅ ESLint with TypeScript ESLint
 - ✅ Memory Bank structure created
+- ✅ Firebase Auth with anonymous sign-in
+- ✅ Magic link token validation
+- ✅ Protected routes (RequireAuth, RequireRole)
+- ✅ Role detection from Firestore
+- ✅ React Router with route protection
+- ✅ Auth state management (Zustand integration)
+- ✅ Cloud Functions structure
 
 ## What's Left to Build
 
-### Epic 0 (Current)
-- ⏳ Cursor rules (15+ files)
-- ⏳ Modular folder structure
-- ⏳ Config modules
-- ⏳ Store foundation
+### Epic 0 (Completed)
+- ✅ Cursor rules (15+ files)
+- ✅ Modular folder structure
+- ✅ Config modules
+- ✅ Store foundation
 
-### Epic 1: Authentication & Magic Links
-- Firebase Auth setup
-- Magic link generation
-- Protected routes
+### Epic 1: Authentication & Magic Links (Completed)
+- ✅ Firebase Auth setup
+- ✅ Magic link token validation
+- ✅ Protected routes
+- ✅ Role-based access control
 
 ### Epic 2: Room Creation & Management
 - Dashboard layout
@@ -59,24 +67,34 @@
 
 ## Current Status
 
-**Overall Progress:** ~5% (Epic 0 in progress)
+**Overall Progress:** ~15% (Epic 0 & Epic 1 completed)
 
 **Completed:**
 - Project setup (Vite, React, TypeScript)
 - Memory Bank documentation structure
+- Epic 0: Foundation setup (config, store, folder structure)
+- Epic 1: Authentication & Magic Links (complete auth system)
 
 **In Progress:**
-- Epic 0 foundation setup
+- Epic 2: Room Creation & Management (next)
 
 **Blocked:**
 - None
 
 ## Known Issues
-- None yet
+- Cloud Function for magic link generation is placeholder (will be implemented in deployment phase)
+- Magic link token exchange not yet implemented (placeholder flow in useMagicLink hook)
+
+## Recent Fixes
+- ✅ Resolved TypeScript build errors
+  - Removed non-existent `sendPasswordlessEmail` from Firebase Auth (magic links generated server-side)
+  - Cleaned up unused imports and variables
+  - All TypeScript strict mode checks passing
+  - Build completes successfully
 
 ## Technical Debt
 - None yet
 
 ## Next Milestone
-Complete Epic 0 foundation setup, then move to Epic 1 (Authentication).
+Epic 2: Room Creation & Management - Dashboard, room creation wizard, Firestore room model
 
