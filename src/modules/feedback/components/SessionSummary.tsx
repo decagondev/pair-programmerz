@@ -1,5 +1,5 @@
+import { useState } from 'react'
 import { useSessionSummary } from '../hooks/useSessionSummary'
-import { downloadPDF } from '../lib/pdfGenerator'
 import { DEFAULT_REFLECTION_QUESTIONS } from '../types'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -24,15 +24,21 @@ interface SessionSummaryProps {
  */
 export function SessionSummary({ roomId }: SessionSummaryProps) {
   const { summary, isLoading, error } = useSessionSummary(roomId)
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false)
 
   const handleDownloadPDF = async () => {
     if (!summary) return
 
+    setIsGeneratingPDF(true)
     try {
+      // Lazy load PDF generator only when needed
+      const { downloadPDF } = await import('../lib/pdfGenerator')
       await downloadPDF(summary)
     } catch (error) {
       console.error('Failed to generate PDF:', error)
       alert('Failed to generate PDF. Please try again.')
+    } finally {
+      setIsGeneratingPDF(false)
     }
   }
 
@@ -81,9 +87,18 @@ export function SessionSummary({ roomId }: SessionSummaryProps) {
               Complete interview session details and feedback
             </p>
           </div>
-          <Button onClick={handleDownloadPDF} className="gap-2">
-            <Download className="h-4 w-4" />
-            Export PDF
+          <Button onClick={handleDownloadPDF} disabled={isGeneratingPDF} className="gap-2">
+            {isGeneratingPDF ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Generating PDF...
+              </>
+            ) : (
+              <>
+                <Download className="h-4 w-4" />
+                Export PDF
+              </>
+            )}
           </Button>
         </div>
 

@@ -26,12 +26,24 @@ export default defineConfig(({ mode }) => ({
     sourcemap: false, // Disable source maps in production for smaller bundle
     rollupOptions: {
       output: {
-        manualChunks: {
+        manualChunks: (id) => {
+          // Separate PDF library into its own chunk (lazy loaded)
+          if (id.includes('@react-pdf/renderer')) {
+            return 'pdf-vendor'
+          }
           // Vendor chunks
-          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          'firebase-vendor': ['firebase/app', 'firebase/auth', 'firebase/firestore'],
-          'liveblocks-vendor': ['@liveblocks/client', '@liveblocks/react', '@liveblocks/yjs'],
-          'editor-vendor': ['codemirror', 'yjs', 'y-codemirror.next'],
+          if (id.includes('react') || id.includes('react-dom') || id.includes('react-router-dom')) {
+            return 'react-vendor'
+          }
+          if (id.includes('firebase')) {
+            return 'firebase-vendor'
+          }
+          if (id.includes('@liveblocks')) {
+            return 'liveblocks-vendor'
+          }
+          if (id.includes('codemirror') || id.includes('yjs') || id.includes('y-codemirror')) {
+            return 'editor-vendor'
+          }
         },
       },
     },
