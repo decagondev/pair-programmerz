@@ -46,11 +46,13 @@
 - ✅ TanStack Query integration for server state
 - ✅ Magic link token generation utility
 
-### Epic 3: Collaborative Editor
-- Liveblocks integration
-- CodeMirror 6 setup
-- Driver/Navigator roles
-- File tree
+### Epic 3: Collaborative Editor (Completed)
+- ✅ Liveblocks room provider with presence awareness
+- ✅ CodeMirror 6 editor with Yjs binding
+- ✅ Driver/Navigator role switching
+- ✅ File tree component
+- ✅ Starter code loading from tasks
+- ✅ Complete editor layout integration
 
 ### Epic 4: Video & Presence UI
 - Daily.co integration
@@ -79,7 +81,7 @@
 
 ## Current Status
 
-**Overall Progress:** ~25% (Epic 0, Epic 1, and Epic 2 completed)
+**Overall Progress:** ~37% (Epic 0, Epic 1, Epic 2, and Epic 3 completed)
 
 **Completed:**
 - Project setup (Vite, React, TypeScript)
@@ -87,9 +89,10 @@
 - Epic 0: Foundation setup (config, store, folder structure)
 - Epic 1: Authentication & Magic Links (complete auth system)
 - Epic 2: Room Creation & Management (complete room management system)
+- Epic 3: Collaborative Editor (complete editor with real-time collaboration)
 
 **In Progress:**
-- Epic 3: Collaborative Editor (next)
+- Epic 4: Video & Presence UI (next)
 
 **Blocked:**
 - None
@@ -110,5 +113,5 @@
 - None yet
 
 ## Next Milestone
-Epic 3: Collaborative Editor - Liveblocks integration, CodeMirror 6 setup, driver/navigator roles, file tree
+Epic 4: Video & Presence UI - Daily.co integration, floating video tiles, reactions and raise hand
 

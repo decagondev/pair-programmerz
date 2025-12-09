@@ -69,8 +69,17 @@ Each module owns:
 
 ### Real-Time Collaboration
 - **Liveblocks** - Primary real-time engine (presence, storage)
+  - Room provider wraps editor components
+  - Presence tracks user cursors, names, roles
+  - Storage holds driver ID and file contents
 - **Yjs** - CRDT for code synchronization (via Liveblocks)
+  - Yjs documents bound to Liveblocks storage
+  - CodeMirror binds to Yjs text type
+  - Real-time synchronization across all clients
 - **CodeMirror 6** - Editor with Yjs binding
+  - Custom theme matching shadcn/ui design system
+  - Read-only mode when user is not driver
+  - TypeScript/JavaScript language support
 
 ### Authentication
 - **Firebase Auth** - Anonymous authentication
@@ -138,9 +147,47 @@ export const useUserStore = create<UserSlice>()((set) => ({
 
 ### Real-Time Sync
 1. Code changes → Yjs document updated
-2. Yjs → Liveblocks storage sync
+2. Yjs → Liveblocks storage sync (via LiveblocksYjsProvider)
 3. Liveblocks → All connected clients receive update
 4. CodeMirror → Renders changes
+
+### Editor Patterns
+
+#### Driver/Navigator Pattern
+- Driver ID stored in Liveblocks storage: `storage.driverId` (string | null)
+- Only driver can edit code (read-only mode for navigators)
+- Interviewer can always take control
+- Visual indicator shows current driver status
+
+#### File Management Pattern
+- Files stored in Liveblocks storage: `storage.files` (Record<string, string>)
+- Active file stored in: `storage.activeFile` (string | null)
+- Starter code loaded from task when room phase changes to 'coding'
+- File tree component allows switching between files
+
+#### Editor Module Structure
+```
+src/modules/editor/
+  components/
+    LiveblocksRoomProvider.tsx  # Liveblocks room context provider
+    PresenceIndicator.tsx        # Avatar stack showing connected users
+    CodeEditor.tsx              # Main CodeMirror 6 editor component
+    DriverIndicator.tsx         # Banner showing driver status
+    DriverControls.tsx          # Buttons for driver control
+    FileTree.tsx                # File tree sidebar
+    EditorLayout.tsx            # Main layout combining all components
+  hooks/
+    usePresence.ts              # Presence management hook
+    useCodeEditor.ts             # CodeMirror editor hook
+    useDriver.ts                 # Driver/navigator management hook
+    useFileTree.ts               # File tree management hook
+  lib/
+    codemirror-theme.ts          # Custom CodeMirror theme
+    yjs-setup.ts                 # Yjs document initialization
+    starter-code-loader.ts       # Starter code parsing utility
+  types.ts                       # Editor type definitions
+  index.ts                       # Barrel exports
+```
 
 ## Module Boundaries
 

@@ -1,6 +1,7 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, useParams } from 'react-router-dom'
 import { JoinPage, AuthProvider, RequireAuth, RequireRole } from '@/modules/auth'
 import { DashboardLayout } from '@/modules/dashboard'
+import { EditorLayout } from '@/modules/editor'
 
 /**
  * Landing page component
@@ -22,18 +23,24 @@ function HomePage() {
 /**
  * Room page component
  * 
- * Placeholder for interview room.
- * Will be implemented in Epic 3.
+ * Main interview room interface with collaborative editor.
+ * Uses EditorLayout which handles all editor functionality.
  */
 function RoomPage() {
-  return (
-    <div className="flex min-h-screen flex-col items-center justify-center">
-      <div className="space-y-4 text-center">
-        <h1 className="text-2xl font-semibold">Interview Room</h1>
-        <p className="text-muted-foreground">Room interface coming soon</p>
+  const { roomId } = useParams<{ roomId: string }>()
+
+  if (!roomId) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-semibold">Room not found</h1>
+          <p className="text-muted-foreground">Invalid room ID</p>
+        </div>
       </div>
-    </div>
-  )
+    )
+  }
+
+  return <EditorLayout roomId={roomId} />
 }
 
 /**
