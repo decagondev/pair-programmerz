@@ -276,10 +276,35 @@ src/modules/dashboard/
   hooks/
     useRooms.ts          # Rooms list query with real-time subscription
     useCreateRoom.ts     # Room creation mutation
-    useTasks.ts          # Tasks query (sampleTasks for now)
+    useTasks.ts          # Tasks query (uses task module with Firestore)
   types.ts               # Dashboard types
   index.ts               # Barrel exports
 ```
+
+### Task Module Structure (Epic 7 ✅)
+```
+src/modules/task/
+  components/
+    AdminTasksPage.tsx   # Main admin tasks page
+    TaskList.tsx         # Task list with actions
+    TaskForm.tsx         # Create/edit task form
+    TaskDialog.tsx       # Dialog wrapper for task form
+  hooks/
+    useTasks.ts         # Query all tasks (Firestore with sampleTasks fallback)
+    useTask.ts           # Query single task by ID
+    useCreateTask.ts    # Create task mutation
+    useUpdateTask.ts     # Update task mutation
+    useDeleteTask.ts     # Delete task mutation
+  types.ts               # Task types (TaskDocument, TaskDocumentWithId, etc.)
+  index.ts               # Barrel exports
+```
+
+### Admin Access Pattern (Epic 7 ✅)
+- **Admin Check**: `isAdmin(userId)` queries Firestore `admins/{userId}` collection
+- **Admin Hook**: `useAdmin()` hook checks current user's admin status
+- **Admin Protection**: `RequireAdmin` component protects admin routes
+- **Admin Collection**: Simple document existence check (managed via Firebase Console)
+- **Security Rules**: Only admins can read admin list, writes disabled (console-only)
 
 ### Real-Time Subscription Pattern
 ```typescript
@@ -416,6 +441,49 @@ src/modules/feedback/
 - **Immediate save**: On field blur for better UX
 - **Optimistic updates**: TanStack Query cache updates on subscription
 - **Error handling**: Console errors, user can manually retry
+
+### Task Management Patterns (Epic 7 ✅)
+
+#### Task Module Structure
+- **Firestore Collection**: `tasks/{taskId}` - All tasks stored in Firestore
+- **Admin Access**: Only admins can create/update/delete tasks
+- **Public Read**: All authenticated users can read tasks
+- **Fallback Strategy**: Falls back to sampleTasks if Firestore is empty (development mode)
+
+#### Task Document Schema
+```typescript
+interface TaskDocument {
+  title: string
+  description: string // Markdown supported
+  difficulty: 'easy' | 'medium' | 'hard'
+  estimatedTime: number // minutes
+  starterCode?: string // Optional starter code
+  language: 'typescript' | 'javascript' | 'python' | 'java'
+  createdAt: Timestamp
+  updatedAt: Timestamp
+  createdBy: string // Admin UID
+}
+```
+
+#### Task CRUD Pattern
+- **Create**: `createTask(input, userId)` - Creates task with auto-generated ID
+- **Create with ID**: `createTaskWithId(taskId, input, userId)` - Creates task with custom ID (for seeding)
+- **Read**: `getAllTasks()` - Query all tasks ordered by createdAt desc
+- **Read One**: `getTaskById(taskId)` - Get single task
+- **Update**: `updateTask(taskId, input)` - Update task fields
+- **Delete**: `deleteTask(taskId)` - Delete task
+- **Real-time**: `subscribeToTasks(callback)` - Real-time subscription for admin page
+
+#### Task Migration Pattern
+- **Seed Script**: `seedTasks(userId)` - Migrates sampleTasks to Firestore
+- **Custom IDs**: Uses original task IDs (task-1, task-2, etc.) for compatibility
+- **Duplicate Check**: Skips tasks that already exist in Firestore
+- **Error Handling**: Continues with other tasks if one fails
+
+#### Task Selection Pattern
+- **Room Creation**: Dashboard uses `useTasks()` hook from task module
+- **Editor Loading**: Editor uses `useTask(taskId)` hook to load starter code
+- **Backward Compatibility**: Task type is compatible with TaskDocumentWithId (extends Task)
 
 ## Testing Strategy (Future)
 - Unit tests for hooks and utilities

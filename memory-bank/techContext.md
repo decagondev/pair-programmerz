@@ -13,7 +13,7 @@
 ### Backend & Services
 - **Firebase v9+ (modular)**
   - Auth (Anonymous + Email magic links)
-  - Firestore (rooms, tasks, notes)
+  - Firestore (rooms, tasks, notes, admins)
   - Functions (magic link generation, phase transitions)
   - Hosting (production deployment)
 - **Liveblocks** - Real-time collaboration (presence, storage, Yjs)
@@ -60,8 +60,7 @@ VITE_FIREBASE_STORAGE_BUCKET=
 VITE_FIREBASE_MESSAGING_SENDER_ID=
 VITE_FIREBASE_APP_ID=
 VITE_LIVEBLOCKS_PUBLIC_KEY=
-VITE_DAILY_API_KEY=
-VITE_DAILY_DOMAIN=
+VITE_JITSI_DOMAIN=  # Optional, defaults to meet.jit.si
 ```
 
 ### Project Structure
@@ -197,4 +196,19 @@ return { ...query, data }
 - Modern browsers (Chrome, Firefox, Safari, Edge)
 - Mobile responsive (iOS Safari, Chrome Mobile)
 - Progressive enhancement for older browsers
+
+## Firestore Collections
+
+### Tasks Collection (Epic 7 ✅)
+- **Collection**: `tasks/{taskId}`
+- **Schema**: TaskDocument (title, description, difficulty, estimatedTime, starterCode, language, createdAt, updatedAt, createdBy)
+- **Security**: Read for all authenticated users, write for admins only
+- **Indexes**: None required (ordered by createdAt desc)
+- **Migration**: Use `seedTasks()` utility to migrate sampleTasks
+
+### Admins Collection (Epic 7 ✅)
+- **Collection**: `admins/{userId}`
+- **Schema**: Simple document existence check (optional fields: userId, createdAt)
+- **Security**: Read for admins only, write disabled (managed via Firebase Console)
+- **Purpose**: Admin access control - check if user is admin
 

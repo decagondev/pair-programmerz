@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useStorage, useMutation } from '@liveblocks/react'
 import { useRoom } from '@/modules/room'
-import { getTaskById } from '@/data/sampleTasks'
+import { useTask } from '@/modules/task'
 import { parseStarterCode, createFileTree } from '../lib/starter-code-loader'
 
 /**
@@ -15,6 +15,7 @@ import { parseStarterCode, createFileTree } from '../lib/starter-code-loader'
  */
 export function useFileTree(roomId: string | null) {
   const { data: room } = useRoom(roomId ?? '')
+  const { data: task } = useTask(room?.taskId ?? null)
   
   // Get files from Liveblocks storage
   const storageFiles = useStorage((root) => {
@@ -43,23 +44,20 @@ export function useFileTree(roomId: string | null) {
 
   // Load starter code when room task is available
   useEffect(() => {
-    if (!room?.taskId || Object.keys(files).length > 0) {
+    if (!task || Object.keys(files).length > 0) {
       return
     }
 
-    const task = getTaskById(room.taskId)
-    if (task) {
-      const parsedFiles = parseStarterCode(task)
-      setFiles(parsedFiles)
-      updateFiles(parsedFiles)
-      
-      // Set first file as active
-      const filePaths = createFileTree(parsedFiles)
-      if (filePaths.length > 0) {
-        setActiveFile(filePaths[0])
-      }
+    const parsedFiles = parseStarterCode(task)
+    setFiles(parsedFiles)
+    updateFiles(parsedFiles)
+    
+    // Set first file as active
+    const filePaths = createFileTree(parsedFiles)
+    if (filePaths.length > 0) {
+      setActiveFile(filePaths[0])
     }
-  }, [room?.taskId, files, updateFiles, setActiveFile])
+  }, [task, files, updateFiles, setActiveFile])
 
   // Update file list when files change
   useEffect(() => {

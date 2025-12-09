@@ -98,16 +98,67 @@ service cloud.firestore {
     }
     
     /**
-     * Tasks collection (future - Epic 7)
+     * Tasks collection
      * 
-     * Placeholder for tasks collection security rules.
-     * Will be implemented in Epic 7.
+     * Security rules for task library.
+     * All authenticated users can read tasks.
+     * Only admins can create/update/delete tasks.
      */
     match /tasks/{taskId} {
-      // Allow read for authenticated users
+      // Helper function to check if user is admin
+      function isAdmin() {
+        return request.auth != null && 
+          exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+      }
+      
+      // Helper function to validate task document structure
+      function isValidTask() {
+        return request.resource.data.keys().hasAll(['title', 'description', 'difficulty', 'estimatedTime', 'language', 'createdAt', 'updatedAt', 'createdBy']) &&
+          request.resource.data.title is string &&
+          request.resource.data.description is string &&
+          request.resource.data.difficulty in ['easy', 'medium', 'hard'] &&
+          request.resource.data.estimatedTime is int &&
+          request.resource.data.language in ['typescript', 'javascript', 'python', 'java'] &&
+          request.resource.data.createdBy is string;
+      }
+      
+      // Read: All authenticated users can read tasks
       allow read: if request.auth != null;
       
-      // Only admins can create/update/delete (will be implemented in Epic 7)
+      // Create: Only admins can create tasks
+      // Must set createdBy to their own UID
+      allow create: if request.auth != null && 
+        isAdmin() &&
+        isValidTask() &&
+        request.resource.data.createdBy == request.auth.uid;
+      
+      // Update: Only admins can update tasks
+      allow update: if request.auth != null && 
+        isAdmin() &&
+        isValidTask();
+      
+      // Delete: Only admins can delete tasks
+      allow delete: if request.auth != null && isAdmin();
+    }
+    
+    /**
+     * Admins collection
+     * 
+     * Security rules for admin access control.
+     * Only existing admins can read the admin list.
+     * Write operations are disabled (managed via Firebase Console).
+     */
+    match /admins/{userId} {
+      // Helper function to check if user is admin
+      function isAdmin() {
+        return request.auth != null && 
+          exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+      }
+      
+      // Read: Only admins can read admin list (for management)
+      allow read: if request.auth != null && isAdmin();
+      
+      // Write: Disabled - admins are managed via Firebase Console
       allow write: if false;
     }
   }

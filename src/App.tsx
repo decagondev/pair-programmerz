@@ -1,8 +1,9 @@
 import { BrowserRouter, Routes, Route, useParams } from 'react-router-dom'
-import { JoinPage, AuthProvider, RequireAuth, RequireRole } from '@/modules/auth'
+import { JoinPage, AuthProvider, RequireAuth, RequireRole, RequireAdmin } from '@/modules/auth'
 import { DashboardLayout } from '@/modules/dashboard'
 import { EditorLayout } from '@/modules/editor'
 import { SessionSummary } from '@/modules/feedback'
+import { AdminTasksPage } from '@/modules/task'
 
 /**
  * Landing page component
@@ -105,6 +106,16 @@ function App() {
             element={
               <RequireAuth>
                 <SummaryPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/admin/tasks"
+            element={
+              <RequireAuth>
+                <RequireAdmin>
+                  <AdminTasksPage />
+                </RequireAdmin>
               </RequireAuth>
             }
           />

@@ -1,20 +1,30 @@
-import { useQuery } from '@tanstack/react-query'
-import { getAllTasks } from '@/data/sampleTasks'
+import { useTasks as useTasksQuery } from '@/modules/task'
+import type { TaskDocumentWithId } from '@/modules/task/types'
 import type { Task } from '@/data/sampleTasks'
 
 /**
  * Hook to fetch available tasks
  * 
- * For now, returns hardcoded sample tasks.
- * In Epic 7, this will query Firestore tasks collection.
+ * Uses Firestore tasks collection with fallback to sample tasks.
  * 
- * @returns Query result with tasks array
+ * @returns Query result with tasks array (compatible with Task type for backward compatibility)
  */
 export function useTasks() {
-  return useQuery<Task[]>({
-    queryKey: ['tasks'],
-    queryFn: () => getAllTasks(),
-    staleTime: 1000 * 60 * 60, // 1 hour - tasks don't change often
-  })
+  const query = useTasksQuery()
+  
+  // Map TaskDocumentWithId to Task format for backward compatibility
+  // The Task type is compatible with TaskDocumentWithId (just without Firestore fields)
+  return {
+    ...query,
+    data: query.data?.map((task) => ({
+      id: task.id,
+      title: task.title,
+      description: task.description,
+      difficulty: task.difficulty,
+      estimatedTime: task.estimatedTime,
+      starterCode: task.starterCode,
+      language: task.language,
+    })) as Task[] | undefined,
+  }
 }
 

@@ -82,9 +82,14 @@
 - ✅ Phase-aware UI rendering
 - ✅ Role-based access control
 
-### Epic 7: Task Library
-- Task CRUD
-- Real production tasks
+### Epic 7: Task Library (Completed)
+- ✅ Task module with types, hooks, and components
+- ✅ Firebase tasks library with CRUD operations
+- ✅ Admin access control (admins collection, useAdmin hook, RequireAdmin component)
+- ✅ Admin tasks page with task management UI
+- ✅ Firestore tasks collection with security rules
+- ✅ Migration script to seed sample tasks
+- ✅ Updated all task references to use Firestore
 
 ### Epic 8: Polish & Ship
 - Mobile responsiveness
@@ -94,7 +99,7 @@
 
 ## Current Status
 
-**Overall Progress:** ~75% (Epic 0, Epic 1, Epic 2, Epic 3, Epic 4, Epic 5, and Epic 6 completed)
+**Overall Progress:** ~87% (Epic 0, Epic 1, Epic 2, Epic 3, Epic 4, Epic 5, Epic 6, and Epic 7 completed)
 
 **Completed:**
 - Project setup (Vite, React, TypeScript)
@@ -106,9 +111,10 @@
 - Epic 4: Video & Presence UI (Jitsi Meet integration, reactions, raise hand)
 - Epic 5: Timer & Phase Engine (phase management, timer, UI locking)
 - Epic 6: Reflection & Feedback (reflection forms, private notes, session summary, PDF export)
+- Epic 7: Task Library (task CRUD, admin interface, Firestore integration)
 
 **In Progress:**
-- Epic 7: Task Library (next)
+- Epic 8: Polish & Ship (next)
 
 **Blocked:**
 - None
@@ -116,7 +122,7 @@
 ## Known Issues
 - Cloud Function for magic link generation is placeholder (will be implemented in deployment phase)
 - Magic link token generation is client-side placeholder (Cloud Function will handle in production)
-- Task selection uses hardcoded sampleTasks (Epic 7 will add Firestore tasks collection)
+- Tasks fallback to sampleTasks if Firestore is empty (expected behavior for development)
 
 ## Recent Fixes
 - ✅ Resolved TypeScript build errors
@@ -129,5 +135,5 @@
 - None yet
 
 ## Next Milestone
-Epic 7: Task Library - Task CRUD for admins, seed real production tasks
+Epic 8: Polish & Ship - Mobile responsiveness, accessibility, CI/CD, performance optimization
 

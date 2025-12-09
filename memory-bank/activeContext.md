@@ -1,16 +1,16 @@
 # Active Context
 
 ## Current Work Focus
-**Epic 6: Reflection & Feedback - COMPLETED**
+**Epic 7: Task Library - COMPLETED**
 
-Successfully implemented complete feedback capture system:
-- Candidate reflection form with auto-save and validation (5 open-ended questions)
-- Interviewer private notes editor with auto-save (visible only to interviewers)
-- Session summary page with aggregated data (reflection + notes + room metadata)
-- PDF export functionality using @react-pdf/renderer
-- Firestore subcollections for reflections and privateNotes with security rules
-- Phase-aware UI (reflection form shown only in reflection phase)
-- Role-based access control (private notes visible only to interviewers)
+Successfully implemented complete task library system:
+- Task module with full CRUD operations (create, read, update, delete)
+- Admin access control system (admins collection, useAdmin hook, RequireAdmin component)
+- Admin tasks page at `/admin/tasks` with task management UI
+- Firestore tasks collection with security rules (read for all, write for admins)
+- Migration script to seed 6 sample tasks to Firestore with custom IDs
+- Updated all task references to use Firestore queries with sampleTasks fallback
+- Task selection in room creation now uses Firestore tasks
 
 ## Recent Changes
 
@@ -44,9 +44,11 @@ Successfully implemented complete feedback capture system:
 
 ## Next Steps
 
-### Immediate (Epic 7)
-1. Task CRUD for admins
-2. Seed real production tasks in Firestore
+### Immediate (Epic 8)
+1. Mobile responsiveness
+2. Accessibility improvements
+3. CI/CD pipeline
+4. Performance optimization
 
 ## Active Decisions
 

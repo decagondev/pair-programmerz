@@ -1,3 +1,4 @@
+import type { TaskDocumentWithId } from '@/modules/task/types'
 import type { Task } from '@/data/sampleTasks'
 
 /**
@@ -6,10 +7,10 @@ import type { Task } from '@/data/sampleTasks'
  * For now, we'll create a single file from the starter code.
  * In the future, this could parse multi-file structures.
  * 
- * @param task - Task with starter code
+ * @param task - Task with starter code (TaskDocumentWithId or Task)
  * @returns Map of file paths to file contents
  */
-export function parseStarterCode(task: Task): Record<string, string> {
+export function parseStarterCode(task: TaskDocumentWithId | Task): Record<string, string> {
   const files: Record<string, string> = {}
 
   if (task.starterCode) {
