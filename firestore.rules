@@ -1,0 +1,73 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    /**
+     * Rooms collection
+     * 
+     * Security rules for interview rooms.
+     * Only participants (creator or in participants array) can read.
+     * Only authenticated users can create rooms.
+     * Only creator can update room metadata.
+     */
+    match /rooms/{roomId} {
+      // Helper function to check if user is a participant
+      function isParticipant() {
+        return request.auth != null && 
+          (resource.data.createdBy == request.auth.uid || 
+           request.auth.uid in resource.data.participants);
+      }
+      
+      // Helper function to check if user is the creator
+      function isCreator() {
+        return request.auth != null && 
+          resource.data.createdBy == request.auth.uid;
+      }
+      
+      // Helper function to validate room document structure
+      function isValidRoom() {
+        return request.resource.data.keys().hasAll(['createdBy', 'participants', 'phase', 'status', 'createdAt', 'updatedAt']) &&
+          request.resource.data.createdBy is string &&
+          request.resource.data.participants is list &&
+          request.resource.data.phase in ['waiting', 'tone', 'coding', 'reflection', 'ended'] &&
+          request.resource.data.status in ['active', 'finished'];
+      }
+      
+      // Read: Only participants can read room documents
+      allow read: if request.auth != null && isParticipant();
+      
+      // Create: Only authenticated users can create rooms
+      // Must set createdBy to their own UID
+      allow create: if request.auth != null && 
+        request.resource.data.createdBy == request.auth.uid &&
+        isValidRoom();
+      
+      // Update: Only creator can update room metadata
+      // Participants can be added by creator
+      // Phase and status can be updated by creator
+      allow update: if request.auth != null && 
+        (isCreator() || 
+         (request.auth.uid in resource.data.participants && 
+          // Participants can only update their own presence (future: Liveblocks)
+          // For now, only creator can update
+          false));
+      
+      // Delete: Only creator can delete rooms
+      allow delete: if request.auth != null && isCreator();
+    }
+    
+    /**
+     * Tasks collection (future - Epic 7)
+     * 
+     * Placeholder for tasks collection security rules.
+     * Will be implemented in Epic 7.
+     */
+    match /tasks/{taskId} {
+      // Allow read for authenticated users
+      allow read: if request.auth != null;
+      
+      // Only admins can create/update/delete (will be implemented in Epic 7)
+      allow write: if false;
+    }
+  }
+}
+

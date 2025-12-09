@@ -1,19 +1,7 @@
 import { doc, getDoc } from 'firebase/firestore'
 import { db } from '@/modules/config/firebase'
 import type { UserRole } from '@/modules/store/types'
-
-/**
- * Room document interface
- * 
- * This matches the Firestore room document structure.
- * Will be expanded in Epic 2 when room creation is implemented.
- */
-interface RoomDocument {
-  createdBy: string
-  participants: string[]
-  taskId?: string
-  phase?: string
-}
+import type { RoomDocument } from '@/modules/room/types'
 
 /**
  * Get user role in a room

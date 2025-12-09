@@ -6,5 +6,14 @@
  * @module dashboard
  */
 
-// Module exports will be added here as they are implemented
+export { DashboardLayout } from './components/DashboardLayout'
+export { RoomList } from './components/RoomList'
+export { RoomCard } from './components/RoomCard'
+export { CreateRoomDialog } from './components/CreateRoomDialog'
+export { CreateRoomForm } from './components/CreateRoomForm'
 
+export { useRooms } from './hooks/useRooms'
+export { useCreateRoom } from './hooks/useCreateRoom'
+export { useTasks } from './hooks/useTasks'
+
+export type { RoomStatusFilter } from './types'

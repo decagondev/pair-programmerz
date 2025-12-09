@@ -20,8 +20,11 @@
 - **Daily.co** - Video/voice (100ms as backup)
 
 ### State Management
-- **Zustand 4+** - Client-side state
-- **TanStack Query** - Server state management
+- **Zustand 4+** - Client-side state (UI state, user preferences)
+- **TanStack Query 5+** - Server state management (Firestore queries, mutations)
+  - Configured with QueryClientProvider in main.tsx
+  - Real-time subscriptions via Firestore onSnapshot with cache updates
+  - Default staleTime: 5 minutes, refetchOnWindowFocus: false
 - **Liveblocks** - Real-time collaborative state
 
 ### Editor
@@ -33,6 +36,9 @@
 - **clsx** + **tailwind-merge** - Class name utilities
 - **zod** - Runtime validation
 - **class-variance-authority** - Component variants
+- **react-hook-form** - Form management
+- **@hookform/resolvers** - Form validation resolvers (zod)
+- **date-fns** - Date formatting utilities
 
 ## Development Setup
 
@@ -115,7 +121,7 @@ VITE_DAILY_DOMAIN=
 {
   "react": "^19.2.0",
   "react-dom": "^19.2.0",
-  "react-router-dom": "^6.x.x",
+  "react-router-dom": "^7.10.1",
   "firebase": "^12.6.0",
   "@liveblocks/client": "^3.11.1",
   "@daily-co/daily-js": "^0.85.0",
@@ -124,7 +130,10 @@ VITE_DAILY_DOMAIN=
   "zod": "^4.1.13",
   "clsx": "^2.1.1",
   "tailwind-merge": "^3.4.0",
-  "lucide-react": "^0.556.0"
+  "lucide-react": "^0.556.0",
+  "react-hook-form": "^7.x.x",
+  "@hookform/resolvers": "^3.x.x",
+  "date-fns": "^3.x.x"
 }
 ```
 
@@ -152,8 +161,35 @@ npm run preview    # Preview production build
 
 ### Deployment
 - **Firebase Hosting** - Production hosting
+- **Firestore Rules** - Security rules in `firestore.rules`
 - **GitHub Actions** - CI/CD pipeline
 - **Auto-deploy** - On merge to `main` branch
+
+## TanStack Query Setup
+
+### Configuration
+- QueryClient configured in `src/main.tsx` with QueryClientProvider
+- Default options:
+  - `staleTime`: 5 minutes
+  - `refetchOnWindowFocus`: false
+- Real-time subscriptions use Firestore `onSnapshot` with manual cache updates
+
+### Usage Pattern
+```typescript
+// Real-time subscription with TanStack Query
+const [data, setData] = useState<T[]>([])
+
+useEffect(() => {
+  const unsubscribe = subscribeToData((updated) => {
+    setData(updated)
+    queryClient.setQueryData(['key'], updated)
+  })
+  return () => unsubscribe()
+}, [])
+
+const query = useQuery({ queryKey: ['key'], queryFn: () => data })
+return { ...query, data }
+```
 
 ## Browser Support
 - Modern browsers (Chrome, Firefox, Safari, Edge)

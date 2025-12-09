@@ -81,7 +81,9 @@ Each module owns:
 - **Protected Routes** - RequireAuth and RequireRole components
 - **Role Detection** - useRole hook queries Firestore room documents
 - **Auth State** - Synced between Firebase Auth and Zustand store
-- **Firestore security rules** - Enforce access control (to be implemented in Epic 2)
+- **Firestore security rules** - Enforce access control (Epic 2 ✅)
+  - Rooms collection: Only participants can read, only creator can create/update/delete
+  - Participant access: Users in `createdBy` or `participants` array can read
 
 ### Video/Voice
 - **Daily.co** - Primary video/voice provider
@@ -119,8 +121,8 @@ export const useUserStore = create<UserSlice>()((set) => ({
 ## Data Flow
 
 ### Room Lifecycle
-1. Interviewer creates room → Firestore `rooms/{id}` created (Epic 2)
-2. Magic link generated → Cloud Function creates token (placeholder in Epic 1)
+1. Interviewer creates room → Firestore `rooms/{id}` created (Epic 2 ✅)
+2. Magic link generated → Client-side token generation (placeholder, Cloud Function in deployment)
 3. Candidate joins → Validates token → Signs in → Redirects to room (Epic 1 ✅)
 4. Phase transitions → Firestore `phase` field updated (Epic 5)
 5. Session ends → Summary generated → Data persisted (Epic 6)
@@ -187,10 +189,74 @@ src/modules/auth/
 - Checks `participants` array for candidate role
 - Caches role in component state (not in Zustand to avoid circular deps)
 
+## Room Management Patterns
+
+### Room Module Structure
+```
+src/modules/room/
+  hooks/
+    useRoom.ts          # Single room query with real-time subscription
+  types.ts              # Room types (RoomDocument, RoomPhase, RoomStatus)
+  index.ts              # Barrel exports
+```
+
+### Dashboard Module Structure
+```
+src/modules/dashboard/
+  components/
+    DashboardLayout.tsx  # Main dashboard page
+    RoomList.tsx         # Room list with filtering
+    RoomCard.tsx         # Individual room card
+    CreateRoomDialog.tsx # Room creation modal
+    CreateRoomForm.tsx   # Room creation form
+  hooks/
+    useRooms.ts          # Rooms list query with real-time subscription
+    useCreateRoom.ts     # Room creation mutation
+    useTasks.ts          # Tasks query (sampleTasks for now)
+  types.ts               # Dashboard types
+  index.ts               # Barrel exports
+```
+
+### Real-Time Subscription Pattern
+```typescript
+// useRooms hook pattern
+export function useRooms() {
+  const [rooms, setRooms] = useState<RoomDocumentWithId[]>([])
+  
+  useEffect(() => {
+    const unsubscribe = subscribeToUserRooms(userId, (updatedRooms) => {
+      setRooms(updatedRooms)
+      queryClient.setQueryData(['rooms', userId], updatedRooms)
+    })
+    return () => unsubscribe()
+  }, [userId, queryClient])
+  
+  // Use TanStack Query for loading/error states
+  const query = useQuery({ queryKey: ['rooms', userId], ... })
+  return { ...query, data: rooms }
+}
+```
+
+### Room Document Schema
+```typescript
+interface RoomDocument {
+  createdBy: string              // Interviewer UID
+  participants: string[]         // Array of participant UIDs
+  taskId: string | null          // Selected task ID
+  phase: 'waiting' | 'tone' | 'coding' | 'reflection' | 'ended'
+  status: 'active' | 'finished' // Computed from phase
+  createdAt: Timestamp
+  updatedAt: Timestamp
+  magicLinkToken?: string        // Generated token
+  magicLinkExpiresAt?: Timestamp // Token expiration
+}
+```
+
 ## Testing Strategy (Future)
 - Unit tests for hooks and utilities
 - Integration tests for module interactions
 - E2E tests for critical flows (room creation, code sync, auth flow)
 - Firebase emulator for Firestore rules testing
 - Auth flow testing (anonymous sign-in, magic link validation)
+- Room creation and management flow testing
 

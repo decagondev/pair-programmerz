@@ -6,5 +6,13 @@
  * @module room
  */
 
-// Module exports will be added here as they are implemented
+export type {
+  RoomDocument,
+  RoomDocumentWithId,
+  CreateRoomInput,
+  UpdateRoomInput,
+  RoomPhase,
+  RoomStatus,
+} from './types'
 
+export { useRoom } from './hooks/useRoom'

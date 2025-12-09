@@ -2,6 +2,46 @@ import { verifyMagicLinkToken } from './auth'
 import type { MagicLinkTokenClaims, MagicLinkValidationResult } from '@/modules/auth/types'
 
 /**
+ * Generate magic link token
+ * 
+ * Generates a simple token string for magic links.
+ * Format: `roomId:${roomId}:role:candidate:exp:${timestamp}`
+ * 
+ * Note: This is a client-side placeholder. In production, this should be
+ * generated server-side via Cloud Function for security.
+ * 
+ * @param roomId - Room ID
+ * @param role - User role (typically 'candidate')
+ * @param expiresInHours - Token expiration in hours (default: 24)
+ * @returns Magic link token string
+ */
+export function generateMagicLinkToken(
+  roomId: string,
+  role: 'interviewer' | 'candidate' = 'candidate',
+  expiresInHours: number = 24
+): string {
+  const exp = Math.floor(Date.now() / 1000) + expiresInHours * 60 * 60
+  return `roomId:${roomId}:role:${role}:exp:${exp}`
+}
+
+/**
+ * Generate magic link URL
+ * 
+ * Creates the full URL for a magic link.
+ * 
+ * @param token - Magic link token
+ * @param baseUrl - Base URL (defaults to current origin)
+ * @returns Full magic link URL
+ */
+export function generateMagicLinkUrl(
+  token: string,
+  baseUrl?: string
+): string {
+  const origin = baseUrl ?? (typeof window !== 'undefined' ? window.location.origin : '')
+  return `${origin}/join/${token}`
+}
+
+/**
  * Validate magic link token
  * 
  * Validates a JWT token from a magic link by:
