@@ -148,11 +148,23 @@ export async function getUserRooms(
 ): Promise<RoomDocumentWithId[]> {
   try {
     const roomsRef = collection(db, 'rooms')
-    const q = query(
-      roomsRef,
-      where('createdBy', '==', userId),
-      orderBy('updatedAt', 'desc')
-    )
+    // Note: Using both where and orderBy requires a composite index
+    // If index is still building, this query will fail
+    // Fallback: query without orderBy, then sort in memory
+    let q
+    try {
+      q = query(
+        roomsRef,
+        where('createdBy', '==', userId),
+        orderBy('updatedAt', 'desc')
+      )
+    } catch (indexError) {
+      // If index doesn't exist yet, query without orderBy
+      q = query(
+        roomsRef,
+        where('createdBy', '==', userId)
+      )
+    }
 
     const querySnapshot = await getDocs(q)
     const rooms: RoomDocumentWithId[] = []
@@ -165,8 +177,52 @@ export async function getUserRooms(
       })
     })
 
+    // Sort by updatedAt descending if we didn't use orderBy
+    // (This happens if the composite index isn't ready yet)
+    if (rooms.length > 0 && rooms[0].updatedAt) {
+      rooms.sort((a, b) => {
+        const aTime = a.updatedAt?.toMillis() ?? 0
+        const bTime = b.updatedAt?.toMillis() ?? 0
+        return bTime - aTime // Descending order
+      })
+    }
+
     return rooms
   } catch (error) {
+    // If query fails (e.g., index not ready), try without orderBy
+    if (error instanceof Error && error.message.includes('index')) {
+      try {
+        const roomsRef = collection(db, 'rooms')
+        const q = query(
+          roomsRef,
+          where('createdBy', '==', userId)
+        )
+        const querySnapshot = await getDocs(q)
+        const rooms: RoomDocumentWithId[] = []
+
+        querySnapshot.forEach((docSnap) => {
+          const data = docSnap.data() as RoomDocument
+          rooms.push({
+            id: docSnap.id,
+            ...data,
+          })
+        })
+
+        // Sort in memory
+        rooms.sort((a, b) => {
+          const aTime = a.updatedAt?.toMillis() ?? 0
+          const bTime = b.updatedAt?.toMillis() ?? 0
+          return bTime - aTime
+        })
+
+        return rooms
+      } catch (fallbackError) {
+        throw new Error(
+          `Failed to get user rooms: ${fallbackError instanceof Error ? fallbackError.message : 'Unknown error'}`
+        )
+      }
+    }
+    
     throw new Error(
       `Failed to get user rooms: ${error instanceof Error ? error.message : 'Unknown error'}`
     )

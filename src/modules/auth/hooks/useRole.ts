@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useUserStore } from '@/modules/store'
-import { getUserRole } from '@/lib/firebase/roles'
+import { getUserRole, isInterviewerGlobally } from '@/lib/firebase/roles'
 import { useAuth } from './useAuth'
 import type { UserRole } from '@/modules/store/types'
 
@@ -8,9 +8,10 @@ import type { UserRole } from '@/modules/store/types'
  * Role detection hook
  * 
  * Determines the user's role in a room by querying Firestore.
+ * If roomId is null, checks if user is an interviewer globally (has created rooms).
  * Caches the role in Zustand store for performance.
  * 
- * @param roomId - Room ID (optional, will return null if not provided)
+ * @param roomId - Room ID (optional, if null checks global interviewer status)
  * @returns User role, loading state, and error
  */
 export function useRole(roomId: string | null) {
@@ -24,7 +25,7 @@ export function useRole(roomId: string | null) {
    * Fetch role from Firestore
    */
   const fetchRole = useCallback(async () => {
-    if (!roomId || !user?.uid) {
+    if (!user?.uid) {
       setRole(null)
       setLoading(false)
       return
@@ -34,7 +35,18 @@ export function useRole(roomId: string | null) {
     setError(null)
 
     try {
-      const userRole = await getUserRole(roomId, user.uid)
+      let userRole: UserRole | null = null
+
+      if (roomId) {
+        // Check role in specific room
+        userRole = await getUserRole(roomId, user.uid)
+      } else {
+        // Check if user is an interviewer globally (has created rooms)
+        // This is used for dashboard access
+        const isInterviewer = await isInterviewerGlobally(user.uid)
+        userRole = isInterviewer ? 'interviewer' : null
+      }
+
       setRole(userRole)
 
       // Update Zustand store with role if it changed

@@ -1,8 +1,8 @@
 import { useEffect, useState, useCallback } from 'react'
 import { onAuthStateChanged, signOut as firebaseSignOut } from 'firebase/auth'
 import { auth } from '@/modules/config/firebase'
-import { useUserStore } from '@/modules/store'
-import { signInAnonymously, sendPasswordlessEmail } from '@/lib/firebase/auth'
+import { useAppStore } from '@/modules/store'
+import { signInAnonymously, sendPasswordlessEmail, signInWithGoogle } from '@/lib/firebase/auth'
 import type { AuthUser, AuthState } from '../types'
 
 /**
@@ -20,7 +20,9 @@ export function useAuth() {
     loading: true,
     error: null,
   })
-  const { setUser, clearUser } = useUserStore()
+  // Get store methods directly to avoid dependency issues
+  const setUser = useAppStore((state) => state.setUser)
+  const clearUser = useAppStore((state) => state.clearUser)
 
   /**
    * Sync user state to Zustand store
@@ -97,11 +99,34 @@ export function useAuth() {
     }
   }, [])
 
+  /**
+   * Sign in with Google
+   */
+  const handleSignInWithGoogle = useCallback(async () => {
+    try {
+      setAuthState((prev) => ({ ...prev, loading: true, error: null }))
+      await signInWithGoogle()
+      // Auth state will be updated via onAuthStateChanged
+    } catch (error) {
+      const authError = error instanceof Error ? error : new Error('Failed to sign in with Google')
+      setAuthState((prev) => ({
+        ...prev,
+        loading: false,
+        error: authError,
+      }))
+      throw authError
+    }
+  }, [])
+
   // Set up auth state listener
   useEffect(() => {
+    let isMounted = true
+
     const unsubscribe = onAuthStateChanged(
       auth,
       (firebaseUser) => {
+        if (!isMounted) return
+
         if (firebaseUser) {
           const authUser: AuthUser = {
             ...firebaseUser,
@@ -122,12 +147,42 @@ export function useAuth() {
           })
           syncUserToStore(null)
           // Auto-sign in anonymously if no user
-          handleSignInAnonymously().catch(() => {
-            // Error already handled in handleSignInAnonymously
+          // Only attempt once to avoid infinite retry loops
+          handleSignInAnonymously().catch((error) => {
+            if (!isMounted) return
+            // Check if it's a configuration error
+            const isConfigError =
+              (error instanceof Error && 
+                (error.message.includes('Firebase Authentication is not configured') ||
+                 error.message.includes('CONFIGURATION_NOT_FOUND') ||
+                 (error as { code?: string }).code === 'CONFIGURATION_NOT_FOUND')) ||
+              (error && typeof error === 'object' && 
+                ('code' in error && 
+                  (String((error as { code?: string }).code).includes('configuration-not-found') ||
+                   String((error as { code?: string }).code).includes('CONFIGURATION_NOT_FOUND'))))
+            
+            if (isConfigError) {
+              setAuthState({
+                user: null,
+                loading: false,
+                error: error instanceof Error ? error : new Error(
+                  'Firebase Authentication is not configured. Please enable Anonymous Authentication in Firebase Console. See docs/FIREBASE_SETUP.md for setup instructions.'
+                ),
+              })
+            } else {
+              // Other errors are already handled in handleSignInAnonymously
+              // But we need to make sure the error state is set
+              setAuthState((prev) => ({
+                ...prev,
+                loading: false,
+                error: error instanceof Error ? error : new Error('Failed to sign in anonymously'),
+              }))
+            }
           })
         }
       },
       (error) => {
+        if (!isMounted) return
         setAuthState({
           user: null,
           loading: false,
@@ -138,6 +193,7 @@ export function useAuth() {
     )
 
     return () => {
+      isMounted = false
       unsubscribe()
     }
   }, [syncUserToStore, handleSignInAnonymously])
@@ -147,6 +203,7 @@ export function useAuth() {
     loading: authState.loading,
     error: authState.error,
     signInAnonymously: handleSignInAnonymously,
+    signInWithGoogle: handleSignInWithGoogle,
     signOut: handleSignOut,
     sendMagicLink: handleSendMagicLink,
   }

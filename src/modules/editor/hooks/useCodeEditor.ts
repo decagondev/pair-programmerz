@@ -5,7 +5,7 @@ import { EditorState } from '@codemirror/state'
 import { yCollab } from 'y-codemirror.next'
 import * as Y from 'yjs'
 import { useRoom } from '@liveblocks/react'
-import { getYjsDocument } from '../lib/yjs-setup'
+import { getYjsDocument, getYjsAwareness } from '../lib/yjs-setup'
 import { codemirrorTheme, readOnlyTheme } from '../lib/codemirror-theme'
 
 /**
@@ -47,8 +47,9 @@ export function useCodeEditor(
       yText.insert(0, initialContent)
     }
 
-    // Create awareness for collaboration (cursors, selections)
-    const awareness = room.getPresence()
+    // Get Yjs awareness for collaboration (cursors, selections)
+    // yCollab requires a Yjs awareness object, not Liveblocks presence
+    const awareness = getYjsAwareness(room)
 
     // Create editor state with Yjs binding
     const state = EditorState.create({
@@ -79,7 +80,7 @@ export function useCodeEditor(
     // Cleanup
     return () => {
       view.destroy()
-      yjsDoc.destroy()
+      // Don't destroy yjsDoc here - it's shared and managed by yjs-setup
       setIsReady(false)
     }
   }, [room, initialContent, readOnly, language])

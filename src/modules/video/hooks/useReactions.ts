@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useStorage, useMutation } from '@liveblocks/react'
 import { useAuth } from '@/modules/auth'
 import type { Reaction } from '../types'
@@ -20,27 +20,7 @@ export function useReactions(roomId: string | null) {
   })
 
   const [localReactions, setLocalReactions] = useState<Reaction[]>([])
-
-  // Sync with Liveblocks storage
-  useEffect(() => {
-    if (reactions) {
-      setLocalReactions(reactions)
-    }
-  }, [reactions])
-
-  // Cleanup old reactions (older than 3 seconds)
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const now = Date.now()
-      const filtered = localReactions.filter((reaction) => now - reaction.timestamp < 3000)
-
-      if (filtered.length !== localReactions.length) {
-        updateReactions(filtered)
-      }
-    }, 500) // Check every 500ms
-
-    return () => clearInterval(interval)
-  }, [localReactions])
+  const lastReactionsRef = useRef<Reaction[]>([])
 
   // Mutation to update reactions in Liveblocks storage
   const updateReactions = useMutation(
@@ -49,6 +29,44 @@ export function useReactions(roomId: string | null) {
     },
     []
   )
+
+  // Sync with Liveblocks storage (only if different to avoid loops)
+  useEffect(() => {
+    if (!reactions) {
+      if (localReactions.length > 0) {
+        setLocalReactions([])
+        lastReactionsRef.current = []
+      }
+      return
+    }
+
+    // Deep comparison to avoid unnecessary updates
+    const currentIds = reactions.map(r => r.id).join(',')
+    const lastIds = lastReactionsRef.current.map(r => r.id).join(',')
+    
+    if (currentIds !== lastIds) {
+      setLocalReactions(reactions)
+      lastReactionsRef.current = reactions
+    }
+  }, [reactions, localReactions.length])
+
+  // Cleanup old reactions (older than 3 seconds)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = Date.now()
+      const filtered = localReactions.filter((reaction) => now - reaction.timestamp < 3000)
+
+      // Only update if we actually removed reactions
+      if (filtered.length !== localReactions.length) {
+        setLocalReactions(filtered)
+        // Update storage, but use a ref to avoid dependency issues
+        updateReactions(filtered)
+        lastReactionsRef.current = filtered
+      }
+    }, 500) // Check every 500ms
+
+    return () => clearInterval(interval)
+  }, [localReactions, updateReactions])
 
   /**
    * Trigger a reaction

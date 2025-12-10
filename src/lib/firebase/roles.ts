@@ -1,4 +1,4 @@
-import { doc, getDoc } from 'firebase/firestore'
+import { doc, getDoc, collection, query, where, getDocs, limit } from 'firebase/firestore'
 import { db } from '@/modules/config/firebase'
 import type { UserRole } from '@/modules/store/types'
 import type { RoomDocument } from '@/modules/room/types'
@@ -76,6 +76,31 @@ export async function isCandidate(roomId: string, userId: string): Promise<boole
   try {
     const role = await getUserRole(roomId, userId)
     return role === 'candidate'
+  } catch {
+    return false
+  }
+}
+
+/**
+ * Check if user is an interviewer (has created any rooms)
+ * 
+ * This is used for dashboard access - users who have created rooms
+ * are considered interviewers and can access the dashboard.
+ * 
+ * @param userId - User ID
+ * @returns True if user has created at least one room
+ */
+export async function isInterviewerGlobally(userId: string): Promise<boolean> {
+  try {
+    const roomsRef = collection(db, 'rooms')
+    const q = query(
+      roomsRef,
+      where('createdBy', '==', userId),
+      limit(1) // We only need to know if at least one exists
+    )
+    
+    const querySnapshot = await getDocs(q)
+    return !querySnapshot.empty
   } catch {
     return false
   }

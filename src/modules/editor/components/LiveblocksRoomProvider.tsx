@@ -50,10 +50,18 @@ export function LiveblocksRoomProvider({
     isTyping: false,
   }
 
+  // Initialize storage structure
+  const initialStorage = {
+    files: {} as Record<string, string>,
+    activeFile: null as string | null,
+    driverId: null as string | null,
+  }
+
   return (
     <RoomProvider
       id={roomId}
       initialPresence={initialPresence as any}
+      initialStorage={initialStorage}
     >
       {children}
     </RoomProvider>

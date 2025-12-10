@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useStorage, useMutation } from '@liveblocks/react'
 import { useAuth } from '@/modules/auth'
 
@@ -19,13 +19,28 @@ export function useRaiseHand(roomId: string | null) {
   })
 
   const [localRaisedHands, setLocalRaisedHands] = useState<string[]>([])
+  const lastRaisedHandsRef = useRef<string[]>([])
 
-  // Sync with Liveblocks storage
+  // Sync with Liveblocks storage (only if different to avoid loops)
   useEffect(() => {
-    if (raisedHands) {
-      setLocalRaisedHands(raisedHands)
+    if (!raisedHands || raisedHands.length === 0) {
+      if (localRaisedHands.length > 0) {
+        setLocalRaisedHands([])
+        lastRaisedHandsRef.current = []
+      }
+      return
     }
-  }, [raisedHands])
+
+    // Compare by joining sorted IDs to avoid reference equality issues
+    const currentIds = [...raisedHands].sort().join(',')
+    const lastIds = [...lastRaisedHandsRef.current].sort().join(',')
+    
+    // Only update if the content actually changed
+    if (currentIds !== lastIds) {
+      setLocalRaisedHands([...raisedHands]) // Create a new array to break reference
+      lastRaisedHandsRef.current = [...raisedHands]
+    }
+  }, [raisedHands]) // Remove localRaisedHands.length from deps to avoid loops
 
   // Mutation to update raised hands in Liveblocks storage
   const updateRaisedHands = useMutation(

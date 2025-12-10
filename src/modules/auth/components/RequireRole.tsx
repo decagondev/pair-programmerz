@@ -56,7 +56,16 @@ export function RequireRole({
   }
 
   // Show access denied if role doesn't match
+  // Special case: For dashboard (no roomId), allow authenticated users even if they haven't created rooms yet
+  // They'll become an "interviewer" when they create their first room
   if (role !== requiredRole) {
+    // If this is for dashboard access (no roomId) and user is authenticated, allow access
+    // This allows first-time users to access the dashboard and create their first room
+    if (!roomId && requiredRole === 'interviewer' && user) {
+      // Allow access - user can create rooms and become an interviewer
+      return <>{children}</>
+    }
+
     return (
       <div className="flex min-h-screen flex-col items-center justify-center p-4">
         <div className="w-full max-w-md space-y-4 rounded-lg border bg-card p-6 shadow-sm">

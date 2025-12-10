@@ -1,6 +1,6 @@
 import { Suspense, lazy } from 'react'
-import { BrowserRouter, Routes, Route, useParams } from 'react-router-dom'
-import { JoinPage, AuthProvider, RequireAuth, RequireRole, RequireAdmin } from '@/modules/auth'
+import { BrowserRouter, Routes, Route, useParams, Navigate, useNavigate } from 'react-router-dom'
+import { JoinPage, AuthProvider, RequireAuth, RequireRole, RequireAdmin, useAuth } from '@/modules/auth'
 
 // Lazy load major routes for code splitting
 const DashboardLayout = lazy(() => import('@/modules/dashboard').then(m => ({ default: m.DashboardLayout })))
@@ -29,11 +29,44 @@ function LoadingFallback() {
  * Will be replaced with proper landing page in future epic.
  */
 function HomePage() {
+  const { user, signInWithGoogle, loading } = useAuth()
+  const navigate = useNavigate()
+
+  const handleSignIn = async () => {
+    try {
+      await signInWithGoogle()
+      // Redirect to dashboard after sign in
+      navigate('/dashboard')
+    } catch (error) {
+      console.error('Failed to sign in:', error)
+    }
+  }
+
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center">
-      <div className="space-y-4 text-center">
-        <h1 className="text-4xl font-bold">PairCode</h1>
-        <p className="text-muted-foreground">Real-time pair programming interviews</p>
+    <div className="flex min-h-screen flex-col items-center justify-center p-4">
+      <div className="space-y-6 text-center max-w-md">
+        <div className="space-y-2">
+          <h1 className="text-4xl font-bold">PairCode</h1>
+          <p className="text-muted-foreground">Real-time pair programming interviews</p>
+        </div>
+        <div className="flex flex-col gap-3 pt-4">
+          {user ? (
+            <a
+              href="/dashboard"
+              className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            >
+              Go to Dashboard
+            </a>
+          ) : (
+            <button
+              onClick={handleSignIn}
+              disabled={loading}
+              className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? 'Signing in...' : 'Sign in with Google'}
+            </button>
+          )}
+        </div>
       </div>
     </div>
   )
@@ -115,6 +148,15 @@ function App() {
           <Route path="/join/:token" element={<JoinPage />} />
 
           {/* Protected routes */}
+          {/* Redirect /wizard to /dashboard (wizard is now a dialog, not a separate route) */}
+          <Route
+            path="/wizard"
+            element={<Navigate to="/dashboard" replace />}
+          />
+          <Route
+            path="/wizard/"
+            element={<Navigate to="/dashboard" replace />}
+          />
           <Route
             path="/dashboard"
             element={
@@ -157,6 +199,18 @@ function App() {
                   </Suspense>
                 </RequireAdmin>
               </RequireAuth>
+            }
+          />
+          {/* Catch-all route for unknown paths */}
+          <Route
+            path="*"
+            element={
+              <div className="flex min-h-screen flex-col items-center justify-center">
+                <div className="text-center">
+                  <h1 className="text-2xl font-semibold">Page not found</h1>
+                  <p className="text-muted-foreground">The page you're looking for doesn't exist.</p>
+                </div>
+              </div>
             }
           />
         </Routes>

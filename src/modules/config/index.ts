@@ -21,5 +21,5 @@ export { firebaseApp, auth, db } from './firebase'
 export { liveblocksClient } from './liveblocks'
 
 // Jitsi Meet
-export { jitsiDomain, defaultJitsiConfig, defaultJitsiInterfaceConfig } from './jitsi'
+export { jitsiDomain, jitsiJaaSConfig, defaultJitsiConfig, defaultJitsiInterfaceConfig } from './jitsi'
 

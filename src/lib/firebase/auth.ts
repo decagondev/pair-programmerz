@@ -1,9 +1,44 @@
 import {
   signInAnonymously as firebaseSignInAnonymously,
   signInWithCustomToken as firebaseSignInWithCustomToken,
+  signInWithPopup,
+  GoogleAuthProvider,
   type UserCredential,
 } from 'firebase/auth'
 import { auth } from '@/modules/config/firebase'
+
+/**
+ * Firebase error type (not exported from firebase/auth, so we define it locally)
+ */
+interface FirebaseError {
+  code?: string
+  message?: string
+}
+
+/**
+ * Check if error is a Firebase configuration error
+ */
+function isConfigurationError(error: unknown): boolean {
+  if (error && typeof error === 'object') {
+    const firebaseError = error as FirebaseError
+    // Check Firebase error code
+    if (firebaseError.code) {
+      return (
+        firebaseError.code.includes('configuration-not-found') ||
+        firebaseError.code.includes('CONFIGURATION_NOT_FOUND') ||
+        firebaseError.code === 'auth/configuration-not-found'
+      )
+    }
+    // Check error message
+    const errorMessage = firebaseError.message || String(error)
+    return (
+      errorMessage.includes('CONFIGURATION_NOT_FOUND') ||
+      errorMessage.includes('configuration-not-found') ||
+      errorMessage.includes('400')
+    )
+  }
+  return false
+}
 
 /**
  * Sign in anonymously using Firebase Auth
@@ -19,6 +54,21 @@ export async function signInAnonymously(): Promise<UserCredential> {
     const credential = await firebaseSignInAnonymously(auth)
     return credential
   } catch (error) {
+    // Preserve Firebase error structure for better error handling
+    if (isConfigurationError(error)) {
+      const configError = new Error(
+        'Firebase Authentication is not configured. Please enable Anonymous Authentication in Firebase Console. See docs/FIREBASE_SETUP.md for setup instructions.'
+      ) as Error & { code?: string; originalError?: unknown }
+      configError.code = 'CONFIGURATION_NOT_FOUND'
+      configError.originalError = error
+      throw configError
+    }
+    
+    // For other errors, preserve the original error if it's a Firebase error
+    if (error && typeof error === 'object' && 'code' in error) {
+      throw error
+    }
+    
     throw new Error(
       `Failed to sign in anonymously: ${error instanceof Error ? error.message : 'Unknown error'}`
     )
@@ -105,6 +155,26 @@ export async function verifyMagicLinkToken(
       valid: false,
       error: error instanceof Error ? error.message : 'Unknown error',
     }
+  }
+}
+
+/**
+ * Sign in with Google
+ * 
+ * Uses Firebase Google Auth provider to sign in the user.
+ * 
+ * @returns Promise resolving to user credential
+ * @throws {Error} If sign-in fails
+ */
+export async function signInWithGoogle(): Promise<UserCredential> {
+  try {
+    const provider = new GoogleAuthProvider()
+    const credential = await signInWithPopup(auth, provider)
+    return credential
+  } catch (error) {
+    throw new Error(
+      `Failed to sign in with Google: ${error instanceof Error ? error.message : 'Unknown error'}`
+    )
   }
 }
 

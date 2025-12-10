@@ -49,11 +49,15 @@ export function CreateRoomForm({ onSuccess }: CreateRoomFormProps) {
   })
 
   const selectedTaskId = watch('taskId')
+  // Use a special value for "no task" since Radix UI doesn't allow empty strings
+  const NO_TASK_VALUE = '__no_task__'
 
   const onSubmit = async (data: CreateRoomFormData) => {
     try {
+      // Convert the special "no task" value back to null
+      const taskId = data.taskId === NO_TASK_VALUE ? null : data.taskId
       await createRoom.mutateAsync({
-        taskId: data.taskId || null,
+        taskId: taskId || null,
       })
       onSuccess?.()
     } catch (error) {
@@ -96,14 +100,17 @@ export function CreateRoomForm({ onSuccess }: CreateRoomFormProps) {
           Select Task (Optional)
         </label>
         <Select
-          value={selectedTaskId || ''}
-          onValueChange={(value) => setValue('taskId', value || null)}
+          value={selectedTaskId || NO_TASK_VALUE}
+          onValueChange={(value) => {
+            // Convert the special "no task" value to null
+            setValue('taskId', value === NO_TASK_VALUE ? null : value)
+          }}
         >
           <SelectTrigger id="taskId" className="w-full min-h-[44px]">
             <SelectValue placeholder="Choose a task or leave blank" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">No task (Custom interview)</SelectItem>
+            <SelectItem value={NO_TASK_VALUE}>No task (Custom interview)</SelectItem>
             {tasks.map((task: Task) => (
               <SelectItem key={task.id} value={task.id}>
                 {task.title} ({task.difficulty})

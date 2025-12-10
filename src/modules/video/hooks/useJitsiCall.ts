@@ -123,6 +123,22 @@ export function useJitsiCall(
       setCallState('error')
     })
 
+    // Handle conference failed event (e.g., members-only/lobby errors, JWT errors)
+    jitsiApi.addEventListener('conferenceFailed', (errorData) => {
+      const errorInfo = errorData as { error?: string; message?: string }
+      const errorMsg = errorInfo?.error || errorInfo?.message || 'Conference failed'
+      
+      // Check if it's a JWT error
+      if (errorMsg.includes('JWT') || errorMsg.includes('jwt') || errorMsg.includes('tenant')) {
+        setError(new Error('JWT authentication failed. Please check your JaaS configuration or remove it to use public Jitsi.'))
+      } else if (errorMsg.includes('membersOnly') || errorMsg.includes('lobby')) {
+        setError(new Error('Video call requires authentication. Please configure JaaS properly or use a custom Jitsi domain.'))
+      } else {
+        setError(new Error(`Video call failed: ${errorMsg}`))
+      }
+      setCallState('error')
+    })
+
     jitsiApi.addEventListener('readyToClose', () => {
       setCallState('left')
       setParticipants([])

@@ -20,6 +20,12 @@ const envSchema = z.object({
 
   // Jitsi configuration (optional - defaults to meet.jit.si)
   VITE_JITSI_DOMAIN: z.string().optional(),
+  // Jitsi as a Service (JaaS) configuration (optional)
+  VITE_JITSI_APP_ID: z.string().optional(),
+  VITE_JITSI_JWT: z.string().optional(),
+  // JaaS tenant name (required if using JaaS)
+  // Get this from your JaaS dashboard - it's part of your App ID
+  VITE_JITSI_TENANT: z.string().optional(),
 })
 
 /**
@@ -30,16 +36,39 @@ const envSchema = z.object({
  * 
  * @throws {z.ZodError} If any required environment variable is missing or invalid
  */
-export const env = envSchema.parse({
-  VITE_FIREBASE_API_KEY: import.meta.env.VITE_FIREBASE_API_KEY,
-  VITE_FIREBASE_AUTH_DOMAIN: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  VITE_FIREBASE_PROJECT_ID: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  VITE_FIREBASE_STORAGE_BUCKET: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  VITE_FIREBASE_MESSAGING_SENDER_ID: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  VITE_FIREBASE_APP_ID: import.meta.env.VITE_FIREBASE_APP_ID,
-  VITE_LIVEBLOCKS_PUBLIC_KEY: import.meta.env.VITE_LIVEBLOCKS_PUBLIC_KEY,
-  VITE_JITSI_DOMAIN: import.meta.env.VITE_JITSI_DOMAIN,
-})
+const parseEnv = () => {
+  try {
+    return envSchema.parse({
+      VITE_FIREBASE_API_KEY: import.meta.env.VITE_FIREBASE_API_KEY,
+      VITE_FIREBASE_AUTH_DOMAIN: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+      VITE_FIREBASE_PROJECT_ID: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+      VITE_FIREBASE_STORAGE_BUCKET: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+      VITE_FIREBASE_MESSAGING_SENDER_ID: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+      VITE_FIREBASE_APP_ID: import.meta.env.VITE_FIREBASE_APP_ID,
+      VITE_LIVEBLOCKS_PUBLIC_KEY: import.meta.env.VITE_LIVEBLOCKS_PUBLIC_KEY,
+      VITE_JITSI_DOMAIN: import.meta.env.VITE_JITSI_DOMAIN,
+      VITE_JITSI_APP_ID: import.meta.env.VITE_JITSI_APP_ID,
+      VITE_JITSI_JWT: import.meta.env.VITE_JITSI_JWT,
+      VITE_JITSI_TENANT: import.meta.env.VITE_JITSI_TENANT,
+    })
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      const missingVars = error.issues
+        .filter((e: z.ZodIssue) => e.code === 'too_small' || e.code === 'invalid_type')
+        .map((e: z.ZodIssue) => e.path.join('.'))
+        .join(', ')
+      
+      throw new Error(
+        `Missing or invalid environment variables: ${missingVars}\n\n` +
+        `Please create a .env file in the project root with the required variables.\n` +
+        `See env.example for a template.`
+      )
+    }
+    throw error
+  }
+}
+
+export const env = parseEnv()
 
 /**
  * Type-safe environment variables
