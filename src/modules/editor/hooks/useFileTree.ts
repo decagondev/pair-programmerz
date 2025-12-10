@@ -15,7 +15,7 @@ import { parseStarterCode, createFileTree } from '../lib/starter-code-loader'
  */
 export function useFileTree(roomId: string | null) {
   const { data: room } = useRoom(roomId ?? '')
-  const { data: task } = useTask(room?.taskId ?? null)
+  const { data: task, isLoading: taskLoading, error: taskError } = useTask(room?.taskId ?? null)
   const status = useStatus()
   
   // Get files from Liveblocks storage
@@ -55,19 +55,39 @@ export function useFileTree(roomId: string | null) {
 
   // Load starter code when room task is available and storage is ready
   useEffect(() => {
+    // Debug logging
+    console.log('[useFileTree] Effect triggered:', {
+      status,
+      isStorageLoading,
+      hasStorageFiles: storageFiles !== null && storageFiles !== undefined,
+      storageFileCount: storageFiles ? Object.keys(storageFiles).length : 0,
+      hasTask: !!task,
+      taskId: room?.taskId,
+      taskLoading,
+      taskError: !!taskError,
+      localFileCount: Object.keys(files).length,
+    })
+
     // Wait for storage to be loaded and connected
     if (status !== 'connected' || isStorageLoading) {
+      console.log('[useFileTree] Waiting for storage connection...')
       return
     }
 
     // Check if storage is actually available by checking if we can read from it
     // If storageFiles is still null/undefined, storage isn't ready yet
     if (storageFiles === null || storageFiles === undefined) {
+      console.log('[useFileTree] Storage not ready yet (null/undefined)')
+      return
+    }
+
+    // Wait for task to finish loading (if there's a taskId)
+    if (room?.taskId && taskLoading) {
       return
     }
 
     // If no task is assigned (custom interview), create a default empty file
-    if (!task) {
+    if (!room?.taskId) {
       // Only create default file if storage is empty
       if (Object.keys(storageFiles).length === 0 && Object.keys(files).length === 0) {
         const defaultFiles = {
@@ -87,9 +107,51 @@ export function useFileTree(roomId: string | null) {
       return
     }
 
-    // Check if storage is actually available by checking if we can read from it
-    // If storageFiles is still null/undefined, storage isn't ready yet
-    if (storageFiles === null || storageFiles === undefined) {
+    // If task is still loading, wait
+    if (taskLoading) {
+      return
+    }
+
+    // If task failed to load but taskId exists, create default file
+    if (taskError) {
+      console.error('Failed to load task:', taskError)
+      // Still create a default file so user can code
+      if (Object.keys(storageFiles).length === 0 && Object.keys(files).length === 0) {
+        const defaultFiles = {
+          'src/App.tsx': `// Task failed to load (${room.taskId})\n// Start coding here...\n\n`,
+        }
+        setFiles(defaultFiles)
+        const timeoutId = setTimeout(() => {
+          try {
+            updateFiles(defaultFiles)
+            setActiveFile('src/App.tsx')
+          } catch (error) {
+            console.error('Failed to save default files:', error)
+          }
+        }, 200)
+        return () => clearTimeout(timeoutId)
+      }
+      return
+    }
+
+    // If taskId exists but task is null (not found), create default file
+    if (!task) {
+      // Task might not exist - create default file
+      if (Object.keys(storageFiles).length === 0 && Object.keys(files).length === 0) {
+        const defaultFiles = {
+          'src/App.tsx': `// Task not found (${room.taskId})\n// Start coding here...\n\n`,
+        }
+        setFiles(defaultFiles)
+        const timeoutId = setTimeout(() => {
+          try {
+            updateFiles(defaultFiles)
+            setActiveFile('src/App.tsx')
+          } catch (error) {
+            console.error('Failed to save default files:', error)
+          }
+        }, 200)
+        return () => clearTimeout(timeoutId)
+      }
       return
     }
 
@@ -127,14 +189,15 @@ export function useFileTree(roomId: string | null) {
       return
     }
 
-    // Debug logging in development
-    if (import.meta.env.DEV) {
-      console.log('Loading files from task:', {
-        taskId: task.id,
-        fileCount: Object.keys(parsedFiles).length,
-        files: Object.keys(parsedFiles),
-      })
-    }
+    // Debug logging (always enabled to help debug production issues)
+    console.log('[useFileTree] Loading files from task:', {
+      taskId: task.id,
+      title: task.title,
+      fileCount: Object.keys(parsedFiles).length,
+      files: Object.keys(parsedFiles),
+      hasStarterCode: !!task.starterCode,
+      language: task.language,
+    })
 
     // Update local state immediately for better UX
     setFiles(parsedFiles)
@@ -168,7 +231,7 @@ export function useFileTree(roomId: string | null) {
     }, 200)
 
     return () => clearTimeout(timeoutId)
-  }, [status, isStorageLoading, task, storageFiles, updateFiles, setActiveFile, files])
+  }, [status, isStorageLoading, task, taskLoading, taskError, room?.taskId, storageFiles, updateFiles, setActiveFile, files])
 
   // Update file list when files change
   useEffect(() => {
