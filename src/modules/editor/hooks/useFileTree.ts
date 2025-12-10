@@ -19,19 +19,23 @@ export function useFileTree(roomId: string | null) {
   const status = useStatus()
   
   // Get files from Liveblocks storage
+  // Note: useStorage returns null when storage is not ready, or the value when ready
   const storageFiles = useStorage((root) => {
+    if (!root) return null
     const files = (root as { files?: Record<string, string> }).files
     return files ?? {}
   })
 
   // Get active file from storage
   const activeFile = useStorage((root) => {
+    if (!root) return null
     return (root as { activeFile?: string }).activeFile ?? null
   })
   
-  // Check if storage is loading - use storageFiles as indicator
-  // If storageFiles is null/undefined, storage isn't ready yet
-  const isStorageLoading = storageFiles === null || storageFiles === undefined
+  // Check if storage is loading
+  // useStorage returns null when storage is not ready
+  // We also check if root exists by checking if we can access the storage structure
+  const isStorageLoading = storageFiles === null || status !== 'connected'
 
   // Local state for file list
   const [files, setFiles] = useState<Record<string, string>>(storageFiles ?? {})

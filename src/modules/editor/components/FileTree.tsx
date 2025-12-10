@@ -26,8 +26,19 @@ interface FileTreeProps {
  * @param props - Component props
  */
 export function FileTree({ roomId, className }: FileTreeProps) {
-  const { fileList, activeFile, switchFile } = useFileTree(roomId)
+  const { fileList, activeFile, switchFile, files } = useFileTree(roomId)
   const buttonRefs = useRef<Map<string, HTMLButtonElement>>(new Map())
+
+  // Debug: Log file state
+  useEffect(() => {
+    console.log('[FileTree] Current state:', {
+      fileListCount: fileList.length,
+      fileList,
+      activeFile,
+      filesCount: Object.keys(files).length,
+      files: Object.keys(files),
+    })
+  }, [fileList, activeFile, files])
 
   // Focus management for keyboard navigation
   useEffect(() => {
