@@ -1,5 +1,4 @@
 import {
-  signInAnonymously as firebaseSignInAnonymously,
   signInWithCustomToken as firebaseSignInWithCustomToken,
   signInWithPopup,
   GoogleAuthProvider,
@@ -17,8 +16,13 @@ interface FirebaseError {
 
 /**
  * Check if error is a Firebase configuration error
+ * 
+ * This function is kept for future use with other authentication methods.
+ * 
+ * @param error - Error to check
+ * @returns True if the error is a configuration error
  */
-function isConfigurationError(error: unknown): boolean {
+export function isConfigurationError(error: unknown): boolean {
   if (error && typeof error === 'object') {
     const firebaseError = error as FirebaseError
     // Check Firebase error code
@@ -38,41 +42,6 @@ function isConfigurationError(error: unknown): boolean {
     )
   }
   return false
-}
-
-/**
- * Sign in anonymously using Firebase Auth
- * 
- * This creates a temporary anonymous account that can later be upgraded
- * to a permanent account via magic link.
- * 
- * @returns Promise resolving to user credential
- * @throws {Error} If sign-in fails
- */
-export async function signInAnonymously(): Promise<UserCredential> {
-  try {
-    const credential = await firebaseSignInAnonymously(auth)
-    return credential
-  } catch (error) {
-    // Preserve Firebase error structure for better error handling
-    if (isConfigurationError(error)) {
-      const configError = new Error(
-        'Firebase Authentication is not configured. Please enable Anonymous Authentication in Firebase Console. See docs/FIREBASE_SETUP.md for setup instructions.'
-      ) as Error & { code?: string; originalError?: unknown }
-      configError.code = 'CONFIGURATION_NOT_FOUND'
-      configError.originalError = error
-      throw configError
-    }
-    
-    // For other errors, preserve the original error if it's a Firebase error
-    if (error && typeof error === 'object' && 'code' in error) {
-      throw error
-    }
-    
-    throw new Error(
-      `Failed to sign in anonymously: ${error instanceof Error ? error.message : 'Unknown error'}`
-    )
-  }
 }
 
 /**

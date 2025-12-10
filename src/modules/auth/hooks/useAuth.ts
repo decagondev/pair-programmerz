@@ -2,14 +2,14 @@ import { useEffect, useState, useCallback } from 'react'
 import { onAuthStateChanged, signOut as firebaseSignOut } from 'firebase/auth'
 import { auth } from '@/modules/config/firebase'
 import { useAppStore } from '@/modules/store'
-import { signInAnonymously, sendPasswordlessEmail, signInWithGoogle } from '@/lib/firebase/auth'
+import { sendPasswordlessEmail, signInWithGoogle } from '@/lib/firebase/auth'
 import type { AuthUser, AuthState } from '../types'
 
 /**
  * Authentication hook
  * 
  * Manages Firebase authentication state and provides authentication methods.
- * Automatically signs in anonymously if no user is authenticated.
+ * Users must sign in with Google to access the application.
  * Syncs user state with Zustand store.
  * 
  * @returns Authentication state and methods
@@ -42,25 +42,6 @@ export function useAuth() {
     },
     [setUser, clearUser]
   )
-
-  /**
-   * Sign in anonymously
-   */
-  const handleSignInAnonymously = useCallback(async () => {
-    try {
-      setAuthState((prev) => ({ ...prev, loading: true, error: null }))
-      await signInAnonymously()
-      // Auth state will be updated via onAuthStateChanged
-    } catch (error) {
-      const authError = error instanceof Error ? error : new Error('Failed to sign in anonymously')
-      setAuthState((prev) => ({
-        ...prev,
-        loading: false,
-        error: authError,
-      }))
-      throw authError
-    }
-  }, [])
 
   /**
    * Sign out
@@ -146,39 +127,7 @@ export function useAuth() {
             error: null,
           })
           syncUserToStore(null)
-          // Auto-sign in anonymously if no user
-          // Only attempt once to avoid infinite retry loops
-          handleSignInAnonymously().catch((error) => {
-            if (!isMounted) return
-            // Check if it's a configuration error
-            const isConfigError =
-              (error instanceof Error && 
-                (error.message.includes('Firebase Authentication is not configured') ||
-                 error.message.includes('CONFIGURATION_NOT_FOUND') ||
-                 (error as { code?: string }).code === 'CONFIGURATION_NOT_FOUND')) ||
-              (error && typeof error === 'object' && 
-                ('code' in error && 
-                  (String((error as { code?: string }).code).includes('configuration-not-found') ||
-                   String((error as { code?: string }).code).includes('CONFIGURATION_NOT_FOUND'))))
-            
-            if (isConfigError) {
-              setAuthState({
-                user: null,
-                loading: false,
-                error: error instanceof Error ? error : new Error(
-                  'Firebase Authentication is not configured. Please enable Anonymous Authentication in Firebase Console. See docs/FIREBASE_SETUP.md for setup instructions.'
-                ),
-              })
-            } else {
-              // Other errors are already handled in handleSignInAnonymously
-              // But we need to make sure the error state is set
-              setAuthState((prev) => ({
-                ...prev,
-                loading: false,
-                error: error instanceof Error ? error : new Error('Failed to sign in anonymously'),
-              }))
-            }
-          })
+          // No auto sign-in - user must sign in with Google
         }
       },
       (error) => {
@@ -196,13 +145,12 @@ export function useAuth() {
       isMounted = false
       unsubscribe()
     }
-  }, [syncUserToStore, handleSignInAnonymously])
+  }, [syncUserToStore])
 
   return {
     user: authState.user,
     loading: authState.loading,
     error: authState.error,
-    signInAnonymously: handleSignInAnonymously,
     signInWithGoogle: handleSignInWithGoogle,
     signOut: handleSignOut,
     sendMagicLink: handleSendMagicLink,

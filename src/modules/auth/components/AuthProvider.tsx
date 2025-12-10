@@ -53,7 +53,7 @@ function FirebaseConfigError({ error }: { error: Error }) {
             <h2 className="font-semibold">Quick Setup Steps:</h2>
             <ol className="list-decimal space-y-2 pl-5 text-sm">
               <li>Go to <a href="https://console.firebase.google.com/" target="_blank" rel="noopener noreferrer" className="text-primary underline">Firebase Console</a></li>
-              <li>Enable <strong>Anonymous Authentication</strong> in Authentication → Sign-in method</li>
+              <li>Enable <strong>Google Authentication</strong> in Authentication → Sign-in method</li>
               <li>Create a <strong>Firestore Database</strong> (start in test mode)</li>
               <li>Copy your Firebase config values to <code className="rounded bg-background px-1 py-0.5 text-xs">.env</code> file</li>
               <li>See <code className="rounded bg-background px-1 py-0.5 text-xs">docs/FIREBASE_SETUP.md</code> for detailed instructions</li>
