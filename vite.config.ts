@@ -31,11 +31,10 @@ export default defineConfig(({ mode }) => ({
           if (id.includes('/modules/config/')) {
             return 'config'
           }
-          // Separate PDF library into its own chunk (lazy loaded)
-          if (id.includes('@react-pdf/renderer')) {
-            return 'pdf-vendor'
-          }
-          // Vendor chunks
+          // Don't split PDF library - it's lazy loaded and splitting causes init issues
+          // Let it be bundled with the main code or other vendors
+          
+          // Vendor chunks - process in order of dependency
           if (id.includes('react') || id.includes('react-dom') || id.includes('react-router-dom')) {
             return 'react-vendor'
           }
@@ -45,7 +44,11 @@ export default defineConfig(({ mode }) => ({
           if (id.includes('@liveblocks')) {
             return 'liveblocks-vendor'
           }
-          if (id.includes('codemirror') || id.includes('yjs') || id.includes('y-codemirror')) {
+          if (id.includes('codemirror') || id.includes('yjs') || id.includes('y-codemirror') || id.includes('y-protocols')) {
+            return 'editor-vendor'
+          }
+          // PDF library - bundle with editor-vendor to avoid init issues
+          if (id.includes('@react-pdf/renderer')) {
             return 'editor-vendor'
           }
         },
