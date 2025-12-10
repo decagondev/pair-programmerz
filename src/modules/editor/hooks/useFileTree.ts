@@ -44,9 +44,29 @@ export function useFileTree(roomId: string | null) {
   // Mutation to update files in storage
   const updateFiles = useMutation(({ storage }, newFiles: Record<string, string>) => {
     if (!storage) {
+      console.error('[useFileTree] Storage not available in mutation')
       throw new Error('Storage not available')
     }
-    storage.set('files', newFiles)
+    
+    console.log('[useFileTree] Mutation: Setting files in storage', {
+      fileCount: Object.keys(newFiles).length,
+      files: Object.keys(newFiles),
+      storageAvailable: !!storage,
+    })
+    
+    try {
+      storage.set('files', newFiles)
+      
+      // Verify the write worked
+      const writtenFiles = storage.get('files')
+      console.log('[useFileTree] Mutation: Files set successfully', {
+        writtenFileCount: writtenFiles ? Object.keys(writtenFiles).length : 0,
+        writtenFiles: writtenFiles ? Object.keys(writtenFiles) : [],
+      })
+    } catch (error) {
+      console.error('[useFileTree] Mutation: Error setting files', error)
+      throw error
+    }
   }, [])
 
   // Mutation to set active file
@@ -209,6 +229,11 @@ export function useFileTree(roomId: string | null) {
     // Update storage - use a delay to ensure storage is fully initialized
     const timeoutId = setTimeout(() => {
       try {
+        console.log('[useFileTree] Attempting to save files to storage:', {
+          fileCount: Object.keys(parsedFiles).length,
+          files: Object.keys(parsedFiles),
+        })
+        
         updateFiles(parsedFiles)
         
         // Set first file as active
@@ -216,19 +241,23 @@ export function useFileTree(roomId: string | null) {
         if (filePaths.length > 0) {
           setActiveFile(filePaths[0])
         }
+        
+        console.log('[useFileTree] Successfully saved files to storage')
       } catch (error) {
         // If storage still not ready, log error and retry
-        console.error('Failed to save files to storage:', error)
+        console.error('[useFileTree] Failed to save files to storage:', error)
         // Retry after a longer delay
         setTimeout(() => {
           try {
+            console.log('[useFileTree] Retrying to save files to storage...')
             updateFiles(parsedFiles)
             const filePaths = createFileTree(parsedFiles)
             if (filePaths.length > 0) {
               setActiveFile(filePaths[0])
             }
+            console.log('[useFileTree] Retry successful')
           } catch (retryError) {
-            console.error('Retry failed to save files to storage:', retryError)
+            console.error('[useFileTree] Retry failed to save files to storage:', retryError)
           }
         }, 500)
       }
