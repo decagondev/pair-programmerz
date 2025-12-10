@@ -68,7 +68,9 @@ const parseEnv = () => {
   }
 }
 
-export const env = parseEnv()
+// Initialize env immediately to ensure it's available when other modules import it
+// This prevents "Cannot access before initialization" errors in production builds
+export const env: z.infer<typeof envSchema> = parseEnv()
 
 /**
  * Type-safe environment variables

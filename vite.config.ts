@@ -27,6 +27,10 @@ export default defineConfig(({ mode }) => ({
     rollupOptions: {
       output: {
         manualChunks: (id) => {
+          // Keep config module together to prevent initialization order issues
+          if (id.includes('/modules/config/')) {
+            return 'config'
+          }
           // Separate PDF library into its own chunk (lazy loaded)
           if (id.includes('@react-pdf/renderer')) {
             return 'pdf-vendor'
@@ -51,5 +55,9 @@ export default defineConfig(({ mode }) => ({
     minify: 'esbuild',
     // Target modern browsers for smaller bundle
     target: 'esnext',
+    // CommonJS options to help with module resolution
+    commonjsOptions: {
+      include: [/node_modules/],
+    },
   },
 }))
