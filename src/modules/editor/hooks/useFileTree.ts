@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useStorage, useMutation, useStatus } from '@liveblocks/react'
 import { useRoom } from '@/modules/room'
 import { useTask } from '@/modules/task'
@@ -17,6 +17,9 @@ export function useFileTree(roomId: string | null) {
   const { data: room } = useRoom(roomId ?? '')
   const { data: task, isLoading: taskLoading, error: taskError } = useTask(room?.taskId ?? null)
   const status = useStatus()
+  
+  // Track if we've already loaded files for this task to prevent duplicate loads
+  const hasLoadedFilesRef = useRef<string | null>(null)
   
   // Get files from Liveblocks storage
   // Note: useStorage returns null when storage is not ready, or the value when ready
@@ -223,48 +226,57 @@ export function useFileTree(roomId: string | null) {
       language: task.language,
     })
 
+    // Check if we've already loaded files for this task
+    if (hasLoadedFilesRef.current === task.id) {
+      console.log('[useFileTree] Files already loaded for this task, skipping')
+      return
+    }
+    
+    // Mark as loaded for this task
+    hasLoadedFilesRef.current = task.id
+    
     // Update local state immediately for better UX
     setFiles(parsedFiles)
     
-    // Update storage - use a delay to ensure storage is fully initialized
-    const timeoutId = setTimeout(() => {
-      try {
-        console.log('[useFileTree] Attempting to save files to storage:', {
-          fileCount: Object.keys(parsedFiles).length,
-          files: Object.keys(parsedFiles),
-        })
-        
-        updateFiles(parsedFiles)
-        
-        // Set first file as active
-        const filePaths = createFileTree(parsedFiles)
-        if (filePaths.length > 0) {
-          setActiveFile(filePaths[0])
-        }
-        
-        console.log('[useFileTree] Successfully saved files to storage')
-      } catch (error) {
-        // If storage still not ready, log error and retry
-        console.error('[useFileTree] Failed to save files to storage:', error)
-        // Retry after a longer delay
-        setTimeout(() => {
-          try {
-            console.log('[useFileTree] Retrying to save files to storage...')
-            updateFiles(parsedFiles)
-            const filePaths = createFileTree(parsedFiles)
-            if (filePaths.length > 0) {
-              setActiveFile(filePaths[0])
-            }
-            console.log('[useFileTree] Retry successful')
-          } catch (retryError) {
-            console.error('[useFileTree] Retry failed to save files to storage:', retryError)
-          }
-        }, 500)
+    // Save files to storage immediately (don't wait for timeout)
+    // The mutation should work synchronously
+    try {
+      console.log('[useFileTree] Attempting to save files to storage:', {
+        fileCount: Object.keys(parsedFiles).length,
+        files: Object.keys(parsedFiles),
+      })
+      
+      updateFiles(parsedFiles)
+      
+      // Set first file as active
+      const filePaths = createFileTree(parsedFiles)
+      if (filePaths.length > 0) {
+        setActiveFile(filePaths[0])
       }
-    }, 200)
-
-    return () => clearTimeout(timeoutId)
-  }, [status, isStorageLoading, task, taskLoading, taskError, room?.taskId, storageFiles, updateFiles, setActiveFile, files])
+      
+      console.log('[useFileTree] Successfully saved files to storage')
+    } catch (error) {
+      // If storage still not ready, log error and retry with delay
+      console.error('[useFileTree] Failed to save files to storage, retrying:', error)
+      
+      // Retry after a delay
+      const timeoutId = setTimeout(() => {
+        try {
+          console.log('[useFileTree] Retrying to save files to storage...')
+          updateFiles(parsedFiles)
+          const filePaths = createFileTree(parsedFiles)
+          if (filePaths.length > 0) {
+            setActiveFile(filePaths[0])
+          }
+          console.log('[useFileTree] Retry successful')
+        } catch (retryError) {
+          console.error('[useFileTree] Retry failed to save files to storage:', retryError)
+        }
+      }, 500)
+      
+      return () => clearTimeout(timeoutId)
+    }
+  }, [status, isStorageLoading, task, taskLoading, taskError, room?.taskId, storageFiles, updateFiles, setActiveFile])
 
   // Update file list when files change
   useEffect(() => {
