@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Loader2, Download } from 'lucide-react'
 import { format } from 'date-fns'
+import { ThemeToggle } from '@/modules/theme'
 
 /**
  * Props for SessionSummary component
@@ -87,7 +88,9 @@ export function SessionSummary({ roomId }: SessionSummaryProps) {
               Complete interview session details and feedback
             </p>
           </div>
-          <Button onClick={handleDownloadPDF} disabled={isGeneratingPDF} className="gap-2">
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <Button onClick={handleDownloadPDF} disabled={isGeneratingPDF} className="gap-2">
             {isGeneratingPDF ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -100,6 +103,7 @@ export function SessionSummary({ roomId }: SessionSummaryProps) {
               </>
             )}
           </Button>
+          </div>
         </div>
 
         {/* Session Information */}

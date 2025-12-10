@@ -1,6 +1,7 @@
 import { Suspense, lazy } from 'react'
 import { BrowserRouter, Routes, Route, useParams, Navigate, useNavigate } from 'react-router-dom'
 import { JoinPage, AuthProvider, RequireAuth, RequireRole, RequireAdmin, useAuth } from '@/modules/auth'
+import { ThemeProvider, ThemeToggle } from '@/modules/theme'
 import { Button } from '@/components/ui/button'
 
 // Lazy load major routes for code splitting
@@ -52,6 +53,9 @@ function HomePage() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center p-4 bg-gradient-to-b from-background to-muted/20">
+      <div className="absolute top-4 right-4">
+        <ThemeToggle />
+      </div>
       <div className="space-y-8 text-center max-w-md w-full">
         <div className="space-y-4">
           <div className="space-y-2">
@@ -174,8 +178,9 @@ function SummaryPage() {
  */
 function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
+    <ThemeProvider>
+      <AuthProvider>
+        <BrowserRouter>
         {/* Skip to main content link for screen readers */}
         <a
           href="#main-content"
@@ -257,6 +262,7 @@ function App() {
         </Routes>
       </BrowserRouter>
     </AuthProvider>
+    </ThemeProvider>
   )
 }
 

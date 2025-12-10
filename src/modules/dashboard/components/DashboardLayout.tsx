@@ -5,6 +5,7 @@ import { RoomList } from './RoomList'
 import { CreateRoomDialog } from './CreateRoomDialog'
 import { useAuth } from '@/modules/auth'
 import { useNavigate } from 'react-router-dom'
+import { ThemeToggle } from '@/modules/theme'
 
 /**
  * Dashboard layout component
@@ -61,6 +62,7 @@ export function DashboardLayout() {
                   <span className="text-muted-foreground text-xs">{user.email}</span>
                 </div>
                 <div className="flex items-center gap-2">
+                  <ThemeToggle />
                   <div className="h-10 w-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-medium text-sm">
                     {getUserInitials()}
                   </div>

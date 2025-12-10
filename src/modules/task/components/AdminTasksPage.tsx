@@ -7,6 +7,7 @@ import { useTasks } from '../hooks/useTasks'
 import { useCreateTask } from '../hooks/useCreateTask'
 import { useUpdateTask } from '../hooks/useUpdateTask'
 import type { CreateTaskInput, UpdateTaskInput, TaskDocumentWithId } from '../types'
+import { ThemeToggle } from '@/modules/theme'
 
 /**
  * Admin tasks page component
@@ -63,10 +64,13 @@ export function AdminTasksPage() {
               Manage interview tasks and starter code
             </p>
           </div>
-          <Button onClick={() => setIsCreateDialogOpen(true)}>
-            <Plus className="mr-2 h-4 w-4" />
-            Create Task
-          </Button>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <Button onClick={() => setIsCreateDialogOpen(true)}>
+              <Plus className="mr-2 h-4 w-4" />
+              Create Task
+            </Button>
+          </div>
         </div>
 
         {/* Task list */}

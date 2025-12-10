@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { useMagicLink } from '../hooks/useMagicLink'
 import { cn } from '@/lib/utils'
+import { ThemeToggle } from '@/modules/theme'
 
 /**
  * Join page component
@@ -52,6 +53,9 @@ export function JoinPage() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center p-4">
+      <div className="absolute top-4 right-4">
+        <ThemeToggle />
+      </div>
       <div className="w-full max-w-md space-y-6 rounded-lg border bg-card p-6 shadow-sm">
         <div className="space-y-2 text-center">
           <h1 className="text-2xl font-semibold">Joining Interview Room</h1>

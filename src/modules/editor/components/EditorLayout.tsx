@@ -11,6 +11,7 @@ import { useUserStore } from '@/modules/store'
 import { cn } from '@/lib/utils'
 import { Menu, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { ThemeToggle } from '@/modules/theme'
 
 /**
  * Props for EditorLayout component
@@ -82,6 +83,7 @@ function EditorLayoutContent({ roomId, className }: EditorLayoutProps) {
           <div className="md:hidden">
             <PhaseControls roomId={roomId} />
           </div>
+          <ThemeToggle />
           <PresenceIndicator roomId={roomId} />
           <ReactionBar roomId={roomId} />
           <RaiseHandButton roomId={roomId} />
