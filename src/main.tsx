@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { createLiveblocksContext } from '@liveblocks/react'
 import { liveblocksClient } from './modules/config'
+import { setupAdminUtilities } from './lib/firebase/admins'
 import './index.css'
 import App from './App.tsx'
 
@@ -21,6 +22,9 @@ const queryClient = new QueryClient({
 })
 
 const { LiveblocksProvider } = createLiveblocksContext(liveblocksClient)
+
+// Setup admin utilities for browser console (development helper)
+setupAdminUtilities()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
